@@ -1,3 +1,6 @@
+# EXECUTAR CÓDIGO:
+# py main.py
+
 import Screen as scrn
 import PySimpleGUI as sg
 
