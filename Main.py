@@ -64,7 +64,7 @@ class Main:
         self.num_files = _num_files
 
     #esse get pega o arquivo da imagem e gera a thumbnail
-    def get_img_data(self, f, maxsize=(1200, 850), first=False):
+    def get_img_data(self, f, maxsize=(320, 320), first=False):
         """Generate image data using PIL
         """
         img = Image.open(f)
@@ -80,23 +80,31 @@ class Main:
     def Iniciar(self):
         #pega o 1° arquivo da lista de aquivos
         filename = os.path.join(self.getFolder(), self.getFileNames()[0])  # name of first file in list
-        #componente do PySimpleGUI que exibe a imagem(não da pra manipular os dados, pois é um objt do tipo sg.Image)
-        image_elem = sg.Image(data=self.get_img_data(filename, first=True))
-        #elemento do PySimpleGUI que exive o nome do arquivo selecionado
-        filename_display_elem = sg.Text(filename, size=(80, 3))
         #elemento mostra o numero de arquivos existentes(formatos suportados) na pasta selecionada
         file_num_display_elem = sg.Text('File 1 of {}'.format(self.getNumFiles()), size=(15, 1))
 
+        #componente do PySimpleGUI que exibe a imagem(não da pra manipular os dados, pois é um objt do tipo sg.Image)
+        image_elem1 = sg.Image(data=self.get_img_data(filename, first=True))
+        #elemento do PySimpleGUI que exive o nome do arquivo selecionado
+        filename_display_elem1 = sg.Text(filename, size=(80, 1), key='file1')
+        
+        image_elem2 = sg.Image(data=self.get_img_data(filename, first=True))
+        filename_display_elem2 = sg.Text(filename, size=(80, 1), key='file2')
+
         # exibe o nome do arquivo seleciona e a imagem
-        col = [[filename_display_elem],
-                [image_elem]]
+        col1 = [[filename_display_elem1],
+                [image_elem1]]
+
+        col2 = [[filename_display_elem2],
+                [image_elem2]]
+
 
         #exibe os nomes dos arquivos e os botões 'next' e 'prev'
-        col_files = [[sg.Listbox(values=self.getFileNames(), change_submits=True, size=(60, 30), key='listbox')],
-                    [sg.Button('Next', size=(8, 2)), sg.Button('Prev', size=(8, 2)), file_num_display_elem]]
+        col_files = [[sg.Listbox(values=self.getFileNames(), change_submits=True, size=(30, 30), key='listbox')],
+                    [sg.Button('Imagem 1', size=(8, 2)), sg.Button('Imagem 2', size=(8, 2)), file_num_display_elem]]
 
         #layout da aplicação
-        layout = [[sg.Column(col_files), sg.Column(col)]]
+        layout = [[sg.Column(col_files), sg.Column(col1), sg.Column(col2)]]
 
         #método que gera a janela(sepa nem precisa da classe Screen{verificar necessidade futura})
         window = sg.Window('Image Browser', layout, return_keyboard_events=True,
@@ -111,28 +119,24 @@ class Main:
             # perform button and keyboard operations
             if event == sg.WIN_CLOSED:
                 break
-            elif event in ('Next', 'MouseWheel:Down', 'Down:40', 'Next:34'):
-                i += 1
-                if i >= self.getNumFiles():
-                    i -= self.getNumFiles()
-                filename = os.path.join(self.getFolder(), self.getFileNames()[i])
-            elif event in ('Prev', 'MouseWheel:Up', 'Up:38', 'Prior:33'):
-                i -= 1
-                if i < 0:
-                    i = self.getNumFiles() + i
-                filename = os.path.join(self.getFolder(), self.getFileNames()[i])
-            elif event == 'listbox':            # something from the listbox
-                f = values["listbox"][0]            # selected filename
-                filename = os.path.join(self.getFolder(), f)  # read this file
-                i = self.getFileNames().index(f)                 # update running index
+            elif event == 'listbox':
+                f = values["listbox"][0]                        # filename selecionado
+                filename = os.path.join(self.getFolder(), f)    # lê o arquivo selecionado
+                i = self.getFileNames().index(f)                # atualiza o index
             else:
                 filename = os.path.join(self.getFolder(), self.getFileNames()[i])
+            
+            if event == 'Imagem 1':
+                # atualiza a janela com a nova imagem
+                image_elem1.update(data=self.get_img_data(filename, first=True))
+                # atualizaz a janela com o novo nome da imagem
+                filename_display_elem1.update(filename)
+            elif event == 'Imagem 2':
+                # atualiza a janela com a nova imagem
+                image_elem2.update(data=self.get_img_data(filename, first=True))
+                # atualizaz a janela com o novo nome da imagem
+                filename_display_elem2.update(filename)
 
-            # atualiza a janela com a nova imagem
-            image_elem.update(data=self.get_img_data(filename, first=True))
-            # atualizaz a janela com o novo nome da imagem
-            filename_display_elem.update(filename)
-            # atualiza a lista de arquivos
             file_num_display_elem.update('File {} of {}'.format(i+1, self.getNumFiles()))
 
         window.close()        
