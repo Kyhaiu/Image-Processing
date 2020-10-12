@@ -86,10 +86,11 @@ class Main:
         #componente do PySimpleGUI que exibe a imagem(não da pra manipular os dados, pois é um objt do tipo sg.Image)
         image_elem1 = sg.Image(data=self.get_img_data(filename, first=True))
         #elemento do PySimpleGUI que exive o nome do arquivo selecionado
-        filename_display_elem1 = sg.Text(filename, size=(80, 1), key='file1')
+
+        filename_display_elem1 = sg.Text('Imagem 1: ' + self.getFileNames()[0], size=(30, 1), key='file1')
         
         image_elem2 = sg.Image(data=self.get_img_data(filename, first=True))
-        filename_display_elem2 = sg.Text(filename, size=(80, 1), key='file2')
+        filename_display_elem2 = sg.Text('Imagem 2: ' + self.getFileNames()[0], size=(30, 1), key='file2')
 
         # exibe o nome do arquivo seleciona e a imagem
         col1 = [[filename_display_elem1],
@@ -101,10 +102,17 @@ class Main:
 
         #exibe os nomes dos arquivos e os botões 'next' e 'prev'
         col_files = [[sg.Listbox(values=self.getFileNames(), change_submits=True, size=(30, 30), key='listbox')],
-                    [sg.Button('Imagem 1', size=(8, 2)), sg.Button('Imagem 2', size=(8, 2)), file_num_display_elem]]
+                    [sg.Button('Imagem 1', size=(8, 2), tooltip='Selecionar o arquivo da imagem 1'), sg.Button('Imagem 2', size=(8, 2), tooltip='Selecionar o arquivo da imagem 2'), file_num_display_elem]]
+
+        #operações que o programa suporta
+        op = [[sg.Text('Operações Aritméticas', size=(17, 1)), sg.Text('Operações Lógicas')],
+             [sg.Radio('Adição',        'radioOP', default=True,  key='add', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='and')],
+             [sg.Radio('Subtração',     'radioOP', default=False, key='sub', size=(15, 1)), sg.Radio('OU lógico',  'radioOP', default=False, key='or' )],
+             [sg.Radio('Multiplicação', 'radioOP', default=False, key='mul', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='not')],
+             [sg.Radio('Divisão',       'radioOP', default=False, key='div', size=(15, 1))]]
 
         #layout da aplicação
-        layout = [[sg.Column(col_files), sg.Column(col1), sg.Column(col2)]]
+        layout = [[sg.Column(col_files), sg.Column(col1), sg.Column(col2), sg.Column(op)]]
 
         #método que gera a janela(sepa nem precisa da classe Screen{verificar necessidade futura})
         window = sg.Window('Image Browser', layout, return_keyboard_events=True,
@@ -130,12 +138,12 @@ class Main:
                 # atualiza a janela com a nova imagem
                 image_elem1.update(data=self.get_img_data(filename, first=True))
                 # atualizaz a janela com o novo nome da imagem
-                filename_display_elem1.update(filename)
+                filename_display_elem1.update('Imagem 1: ' + f)
             elif event == 'Imagem 2':
                 # atualiza a janela com a nova imagem
                 image_elem2.update(data=self.get_img_data(filename, first=True))
                 # atualizaz a janela com o novo nome da imagem
-                filename_display_elem2.update(filename)
+                filename_display_elem2.update('Imagem 2: ' + f)
 
             file_num_display_elem.update('File {} of {}'.format(i+1, self.getNumFiles()))
 
