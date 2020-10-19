@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-import PySimpleGUI as sg
-import os
-from PIL import Image, ImageTk
 import io
+import os
+import numpy as np
+import PySimpleGUI as sg
+from PIL import Image, ImageTk
 
 class Main:
     #Construtor da classe MAIN
@@ -75,6 +76,23 @@ class Main:
             del img
             return bio.getvalue()
         return ImageTk.PhotoImage(img)
+        """
+        # SEPARAÇÃO DOS CANAIS R, G e B
+        # Lê a imagem
+        img = Image.open(f)
+
+        # Converte a imagem para 'RGB'
+        rgb_img = img.convert('RGB')
+
+        # Passa a imagem rgb para um array
+        arr = np.array(rgb_img)
+
+        # Separa os 3 canais com o split
+        r, g, b = np.split(arr, 3, axis = 2)
+        r = r.reshape(-1)
+        g = r.reshape(-1)
+        b = r.reshape(-1)
+        """
 
     #função que inicia a execução
     def Iniciar(self):
