@@ -94,7 +94,7 @@ class Main:
         b = r.reshape(-1)
         """
 
-    #função que inicia a execução
+    #função que inicia a execução (E CRIA A TELA)
     def Iniciar(self):
         #pega o 1° arquivo da lista de aquivos
         filename = os.path.join(self.getFolder(), self.getFileNames()[0])  # name of first file in list
@@ -165,6 +165,7 @@ class Main:
 
             file_num_display_elem.update('File {} of {}'.format(i+1, self.getNumFiles()))
 
-        window.close()        
+        window.close()
+
 screen = Main()
 screen.Iniciar()
