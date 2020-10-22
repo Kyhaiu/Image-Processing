@@ -1,12 +1,33 @@
+import Image as img
 import PySimpleGUI as sg
 
 class Screen:
 
-    def __init__(self, menu, layout, name):
-        self.setMenu(menu)
-        self.setLayout(layout)
-        self.setName(name)
-        self.setScreen(name, menu, layout)
+    def __init__(self):
+        
+        col1 = [[sg.InputText('Importar Imagem 1', key='folderImg1', disabled=True ,size=(40,1), text_color='black', pad=((5,10),(20,10))), 
+                 sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 1', pad=((5,10),(20,10)))],
+                [sg.InputText('Importar Imagem 2', key='folderImg2', disabled=True ,size=(40,1), text_color='black', pad=((5,10),(20,10))),
+                 sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2', pad=((5,10),(20,10)))]]
+
+        col2 = [[sg.Text('Operações Aritméticas', size=(17, 1)), sg.Text('Operações Lógicas')],
+                [sg.Radio('Adição',        'radioOP', default=True,  key='add', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='and')],
+                [sg.Radio('Subtração',     'radioOP', default=False, key='sub', size=(15, 1)), sg.Radio('OU lógico',  'radioOP', default=False, key='or' )],
+                [sg.Radio('Multiplicação', 'radioOP', default=False, key='mul', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='not')],
+                [sg.Radio('Divisão',       'radioOP', default=False, key='div', size=(15, 1))],
+                [sg.SaveAs('Salvar', file_types=(("Bmp Files", "*.bmp"),)), sg.Button('DEGUB COMPONENTS')]]
+        
+        col3 = [[sg.Text('Imagem resultado', size=(20, 1))]]
+        """
+            Componente do PySimpleGUI que exibe a imagem
+            sg.Image(data=self.img.generate_thumbnail(filename, first=True)
+        """
+
+        aux = [[sg.Column(col1), sg.Column(col3)], [sg.Column(col2)]]
+
+        self.setLayout(aux)
+        self.setScreen('name', self.getLayout())
+        del aux
 
     def getScreen(self):
         return self.screen
@@ -20,9 +41,9 @@ class Screen:
     def getName(self):
         return self.name
 
-    def setScreen(self, name, menu, layout):
+    def setScreen(self, name, layout):
         sg.theme('DarkBlue1')
-        self.screen = sg.Window(name, layout, finalize=True, size=(600, 300))
+        self.screen = sg.Window(name, layout, finalize=True, size=(800, 300))
     
     def setMenu(self, _menu):
         self.menu = _menu
@@ -38,4 +59,3 @@ class Screen:
 
     def killWindows(self):
         self.getScreen().Close()
-    
