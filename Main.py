@@ -30,9 +30,9 @@ class Main:
         image = img.Image()
         image.setImage(path)
         image.separate_RGB_Channels()
-        print(image.getRedChannel())    # Print do do canal R de todos os pixels
-        print(image.getGreenChannel())  # Print do do canal G de todos os pixels
-        print(image.getBlueChannel())   # Print do do canal B de todos os pixels
+        print(image.getRedChannel())    # Print do canal R de todos os pixels
+        print(image.getGreenChannel())  # Print do canal G de todos os pixels
+        print(image.getBlueChannel())   # Print do canal B de todos os pixels
         
 main = Main()
 main.StartScreen()
