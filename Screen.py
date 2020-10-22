@@ -5,10 +5,10 @@ class Screen:
 
     def __init__(self):
         
-        col1 = [[sg.InputText('Importar Imagem 1', key='folderImg1', disabled=True ,size=(40,1), text_color='black', pad=((5,10),(20,10))), 
-                 sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 1', pad=((5,10),(20,10)))],
-                [sg.InputText('Importar Imagem 2', key='folderImg2', disabled=True ,size=(40,1), text_color='black', pad=((5,10),(20,10))),
-                 sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2', pad=((5,10),(20,10)))]]
+        col1 = [[sg.InputText('Importar Imagem 1', key='folderImg1', disabled=True ,size=(40,1), text_color='black', pad=((5,10),(20,10)), enable_events=True), 
+                 sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 1', pad=((5,10),(20,10)), key='file1')],
+                [sg.InputText('Importar Imagem 2', key='folderImg2', disabled=True ,size=(40,1), text_color='black', pad=((5,10),(20,10)), enable_events=True),
+                 sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2', pad=((5,10),(20,10)), key='file2')]]
 
         col2 = [[sg.Text('Operações Aritméticas', size=(17, 1)), sg.Text('Operações Lógicas')],
                 [sg.Radio('Adição',        'radioOP', default=True,  key='add', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='and')],

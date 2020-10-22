@@ -1,7 +1,7 @@
 import io
 import os
-import PIL as pil
 import numpy as np
+from PIL import Image as pil
 
 class Image:
     def __init__(self):
@@ -12,9 +12,6 @@ class Image:
 
     def getFileName(self):
         return self.filename
-
-    def getColorMode(self):
-        return self.colorMode
 
     def getResolution(self):
         return self.resolution
@@ -33,9 +30,6 @@ class Image:
 
     def setFileName(self, _filename):
         self.filename = _filename
-
-    def setColorMode(self, _colorMode):
-        self.colorMode = _colorMode
     
     def setResolution(self, _resolution):
         self.resolution = _resolution
@@ -49,7 +43,7 @@ class Image:
     def setBlueChannel(self, _blueChannel):
         self.blueChannel = _blueChannel
 
-    def to_separete_rgb(self):
+    def separate_RGB_Channels(self):
         img = self.getImage()
 
         # Converte a imagem para 'RGB'
