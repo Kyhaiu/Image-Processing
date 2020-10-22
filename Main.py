@@ -20,10 +20,10 @@ class Main:
 
             # Leitura das imagens
             if event == 'folderImg1':
-                self.imgs.append(self.ReadImage(values['folderImg1']))
+                self.imgs[0] = self.ReadImage(values['folderImg1'])
                 self.SeparateChannels(0)
             if event == 'folderImg2':
-                self.imgs.append(self.ReadImage(values['folderImg2']))
+                self.imgs[1] = self.ReadImage(values['folderImg2'])
                 self.SeparateChannels(1)
 
             if event == sg.WIN_CLOSED:
