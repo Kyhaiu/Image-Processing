@@ -17,7 +17,7 @@ class Screen:
                 [sg.Radio('Divisão',       'radioOP', default=False, key='div', size=(15, 1))],
                 [sg.SaveAs('Salvar', file_types=(("Bmp Files", "*.bmp"),)), sg.Button('DEGUB COMPONENTS')]]
         
-        col3 = [[sg.Text('Imagem resultado', size=(20, 1))]]
+        col3 = [[sg.Text('Imagem resultado', size=(20, 1))], [sg.Image(data=None, size=(320, 320), key='thumbnail')]]
         """
             Componente do PySimpleGUI que exibe a imagem
             sg.Image(data=self.img.generate_thumbnail(filename, first=True)
@@ -43,7 +43,7 @@ class Screen:
 
     def setScreen(self, name, layout):
         sg.theme('DarkBlue1')
-        self.screen = sg.Window(name, layout, finalize=True, size=(800, 300))
+        self.screen = sg.Window(name, layout, finalize=True, size=(750, 550))
     
     def setMenu(self, _menu):
         self.menu = _menu
@@ -54,8 +54,8 @@ class Screen:
     def setName(self, _name):
         self.name = _name
 
-    def updateLayoutComponents(self, element, newItens):
-        self.getScreen().FindElement(element).Update(values=newItens)
+    def updateLayoutComponents(self, element, _data):
+        self.getScreen().FindElement(element).Update(data=_data)
 
     def killWindows(self):
         self.getScreen().Close()

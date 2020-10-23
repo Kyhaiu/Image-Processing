@@ -2,6 +2,7 @@ import io
 import os
 import numpy as np
 from PIL import Image as pil
+from PIL import ImageTk
 
 class Image:
     def __init__(self):
@@ -64,18 +65,21 @@ class Image:
         #Desaloca as variaveis
         del img, rgb_img, r, g, b
 
-    def generate_thumbnail(self, f, maxsize=(320, 320), first=False):
-        pass
-        """tem que montar uma função que consiga gerar uma thumbnail com os valores rgb
-            OBS.: essa função só gera uma thumbnail de um arquivo salvo em disco 
-        img = pil.open(f)
+    def generate_thumbnail(self, _img, first = False):
+        """Generate image data using PIL
+        """
+        rgb_img = _img.getImage().convert('RGB')
+        arr = np.asarray(rgb_img)
+        maxsize = (320, 320)
+        img = pil.fromarray(arr)
         img.thumbnail(maxsize)
+
         if first:                     # tkinter is inactive the first time
             bio = io.BytesIO()
             img.save(bio, format="PNG")
             del img
             return bio.getvalue()
-        return pil.PhotoImage(img)
-        """
-
+            
+        del maxsize, arr, rgb_img
+        return ImageTk.PhotoImage(img)
         
