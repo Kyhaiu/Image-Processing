@@ -1,6 +1,7 @@
 import io
 import os
 import numpy as np
+import itertools as it
 from PIL import Image as pil
 from PIL import ImageTk
 
@@ -67,11 +68,11 @@ class Image:
 
     def generate_thumbnail(self, _img, first = False):
         """Generate image data using PIL
-        """
-        rgb_img = _img.getImage().convert('RGB')
-        arr = np.asarray(rgb_img)
+        """    
+        arr = np.dstack((_img.getRedChannel(), _img.getGreenChannel(), _img.getBlueChannel())) .astype(np.uint8)
+
         maxsize = (320, 320)
-        img = pil.fromarray(arr)
+        img = pil.frombytes('L', maxsize, arr)
         img.thumbnail(maxsize)
 
         if first:                     # tkinter is inactive the first time
@@ -80,30 +81,75 @@ class Image:
             del img
             return bio.getvalue()
             
-        del maxsize, arr, rgb_img
+        del maxsize, arr
         return ImageTk.PhotoImage(img)
 
     def apply_operations(self, _img1, _img2, _ops):
+        img_temp = Image()
         if _ops['-ADD-']:
-            self.add_operation(_img1, _img2)
+            img_temp = self.add_operation(_img1, _img2)
+            return img_temp
         elif _ops['-SUB-']:
-            self.sub_operation(_img1, _img2)
+            img_temp = self.sub_operation(_img1, _img2)
         elif _ops['-MUL-']:
-            self.mult_operation(_img1, _img2)
+            img_temp = self.mult_operation(_img1, _img2)
         elif _ops['-DIV-']:
-            self.div_operation(_img1, _img2)
+            img_temp = self.div_operation(_img1, _img2)
         elif _ops['-AND-']:
-            self.and_operation(_img1, _img2)
+            img_temp = self.and_operation(_img1, _img2)
         elif _ops['-OR-']:
-            self.or_operation(_img1, _img2)
+            img_temp = self.or_operation(_img1, _img2)
         elif _ops['-NOT-']:
-            self.not_operation(_img1)
+            img_temp = self.not_operation(_img1)
         return _img1
 
     def add_operation(self, _img1, _img2):
+        # Get dos canais já setados
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
-        print(r1, r2, g1, g2, b1, b2)
+        
+        # Soma cada canal de cada imagem (lista) com os seus respectivos
+        # EX: r[0]_img1 + r[0]_img2
+        sum_r = [sum(x) for x in it.zip_longest(r1, r2, fillvalue = 0)]
+        i = 0
+        while(i < len(sum_r)):
+            if(sum_r[i] > 255):
+                sum_r[i] = 255
+            i+=1
+
+        sum_g = [sum(x) for x in it.zip_longest(g1, g2, fillvalue = 0)]
+        i = 0
+        while(i < len(sum_g)):
+            if(sum_g[i] > 255):
+                sum_g[i] = 255
+            i+=1
+
+        sum_b = [sum(x) for x in it.zip_longest(b1, b2, fillvalue = 0)]
+        i = 0
+        while(i < len(sum_b)):
+            if(sum_b[i] > 255):
+                sum_b[i] = 255
+            i+=1
+
+        # Seta os novos canais calculados
+        img_temp = Image()
+        img_temp.setRedChannel(sum_r)
+        img_temp.setGreenChannel(sum_g)
+        img_temp.setBlueChannel(sum_b)
+
+        # Desaloca as variaveis
+        del r1, r2, sum_r, g1, g2, sum_g, b1, b2, sum_b
+
+        # Retorno do novo objeto Image
+        return img_temp
+
+    """
+        i = 0
+        while i < len(sum_r):
+            print(r1[i], r2[i], sum_r[i], g1[i], g2[i], sum_g[i], b1[i], b2[i], sum_b[i])
+            os.system("PAUSE")
+            i+=1
+    """
 
     def sub_operation(_img1, _img2):
         print("Subtração")

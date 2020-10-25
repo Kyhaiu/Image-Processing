@@ -34,10 +34,16 @@ class Main:
                 if event == '-APPLYOP-':
                     aux = img.Image()
                     operations = values
+
                     for i in range(1, 3, 1):
                         del operations['folderImg' + str(i)]
                         del operations['file' + str(i)]
+
                     self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
+
+                    thumb = aux.generate_thumbnail(self.imgs[2], True)
+
+                    screen.updateLayoutComponents('thumbnail', thumb)
                     del operations, aux
 
             if event == sg.WIN_CLOSED:
