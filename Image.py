@@ -84,5 +84,23 @@ class Image:
         return ImageTk.PhotoImage(img)
 
     def apply_operations(self, _img1, _img2, _ops):
-        print(_img1)
+        if _ops['-ADD-']:
+            self.add_operation(_img1, _img2)
+        elif _ops['-SUB-']:
+            pass
+        elif _ops['-MUL-']:
+            pass
+        elif _ops['-DIV-']:
+            pass
+        elif _ops['-AND-']:
+            pass
+        elif _ops['-OR-']:
+            pass
+        elif _ops['-NOT-']:
+            pass
         return _img1
+
+    def add_operation(self, _img1, _img2):
+        r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
+        r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
+        print(r1, r2, g1, g2, b1, b2)

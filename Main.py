@@ -37,7 +37,6 @@ class Main:
                     for i in range(1, 3, 1):
                         del operations['folderImg' + str(i)]
                         del operations['file' + str(i)]
-                    print(operations)
                     self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
                     del operations, aux
 
@@ -49,6 +48,7 @@ class Main:
     def ReadImage(self, path):
         image = img.Image()
         image.setImage(path)
+        image.separate_RGB_Channels()
         return image
 
 main = Main()
