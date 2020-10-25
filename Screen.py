@@ -1,4 +1,3 @@
-import Image as img
 import PySimpleGUI as sg
 
 class Screen:
@@ -13,11 +12,11 @@ class Screen:
                  sg.FileBrowse(button_text='Procurar', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2', pad=((5,10),(20,10)), key='file2')]]
 
         col2 = [[sg.Text('Operações Aritméticas', size=(17, 1)), sg.Text('Operações Lógicas')],
-                [sg.Radio('Adição',        'radioOP', default=True,  key='add', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='and')],
-                [sg.Radio('Subtração',     'radioOP', default=False, key='sub', size=(15, 1)), sg.Radio('OU lógico',  'radioOP', default=False, key='or' )],
-                [sg.Radio('Multiplicação', 'radioOP', default=False, key='mul', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='not')],
-                [sg.Radio('Divisão',       'radioOP', default=False, key='div', size=(15, 1))],
-                [sg.SaveAs('Salvar', file_types=(("Bmp Files", "*.bmp"),)), sg.Button('DEGUB COMPONENTS')]]
+                [sg.Radio('Adição',        'radioOP', default=True,  key='-ADD-', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='-AND-')],
+                [sg.Radio('Subtração',     'radioOP', default=False, key='-SUB-', size=(15, 1)), sg.Radio('OU lógico',  'radioOP', default=False, key='-OR-' )],
+                [sg.Radio('Multiplicação', 'radioOP', default=False, key='-MUL-', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='-NOT-')],
+                [sg.Radio('Divisão',       'radioOP', default=False, key='-DIV-', size=(15, 1))],
+                [sg.Button('Aplicar operação', key='-APPLYOP-'), sg.Button('DEGUB COMPONENTS')]]
         
         col3 = [[sg.Text('Imagem resultado', size=(20, 1))], [sg.Image(data=None, size=(320, 320), key='thumbnail')]]
         """

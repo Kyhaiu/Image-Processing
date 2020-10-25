@@ -5,8 +5,13 @@ import PySimpleGUI as sg
 import numpy as np
 
 class Main:
-    # Lista de imagens
-    imgs = [img.Image(), img.Image()]
+    """
+        Lista de imgens:
+            - imgs[0] =  Imagem 1
+            - imgs[1] =  Imagem 2
+            - imgs[2] =  Imagem resultado
+    """
+    imgs = [None, None, None]
 
     #Construtor da classe MAIN
     def __init__(self):
@@ -22,15 +27,19 @@ class Main:
             # Leitura das imagens
             if event == 'folderImg1':
                 self.imgs[0] = self.ReadImage(values['folderImg1'])
-                self.SeparateChannels(0)
-
-                """ Gera a thumbanil e atualiza o componente na tela"""
-                thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first = True)
-                screen.updateLayoutComponents('thumbnail', thumb)
             elif event == 'folderImg2':
                 self.imgs[1] = self.ReadImage(values['folderImg2'])
-                self.SeparateChannels(1)
-            
+
+            if self.imgs[0] and self.imgs[1] != None:
+                if event == '-APPLYOP-':
+                    aux = img.Image()
+                    operations = values
+                    for i in range(1, 3, 1):
+                        del operations['folderImg' + str(i)]
+                        del operations['file' + str(i)]
+                    print(operations)
+                    self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
+                    del operations, aux
 
             if event == sg.WIN_CLOSED:
                 break
@@ -42,9 +51,5 @@ class Main:
         image.setImage(path)
         return image
 
-    # Função que faz a separação dos canais RGB pra cada pixel
-    def SeparateChannels(self, position):
-        self.imgs[position].separate_RGB_Channels()
-        
 main = Main()
 main.StartScreen()

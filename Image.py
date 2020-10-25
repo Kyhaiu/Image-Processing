@@ -82,4 +82,7 @@ class Image:
             
         del maxsize, arr, rgb_img
         return ImageTk.PhotoImage(img)
-        
+
+    def apply_operations(self, _img1, _img2, _ops):
+        print(_img1)
+        return _img1
