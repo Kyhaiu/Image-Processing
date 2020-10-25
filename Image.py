@@ -87,20 +87,38 @@ class Image:
         if _ops['-ADD-']:
             self.add_operation(_img1, _img2)
         elif _ops['-SUB-']:
-            pass
+            self.sub_operation(_img1, _img2)
         elif _ops['-MUL-']:
-            pass
+            self.mult_operation(_img1, _img2)
         elif _ops['-DIV-']:
-            pass
+            self.div_operation(_img1, _img2)
         elif _ops['-AND-']:
-            pass
+            self.and_operation(_img1, _img2)
         elif _ops['-OR-']:
-            pass
+            self.or_operation(_img1, _img2)
         elif _ops['-NOT-']:
-            pass
+            self.not_operation(_img1)
         return _img1
 
     def add_operation(self, _img1, _img2):
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
         print(r1, r2, g1, g2, b1, b2)
+
+    def sub_operation(_img1, _img2):
+        print("Subtração")
+
+    def mult_operation(_img1, _img2):
+        print("Multiplicação")
+
+    def div_operation(_img1, _img2):
+        print("Divisão")
+
+    def and_operation(_img1, _img2):
+        print("AND")
+
+    def or_operation(_img1, _img2):
+        print("OR")
+
+    def not_operation(_img1):
+        print("NOT")
