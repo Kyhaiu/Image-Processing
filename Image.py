@@ -1,5 +1,6 @@
 import io
 import os
+import cv2
 import numpy as np
 import itertools as it
 from PIL import Image as pil
@@ -45,6 +46,7 @@ class Image:
     def setBlueChannel(self, _blueChannel):
         self.blueChannel = _blueChannel
 
+    """
     def separate_RGB_Channels(self):
         img = self.getImage()
 
@@ -65,6 +67,16 @@ class Image:
 
         #Desaloca as variaveis
         del img, rgb_img, r, g, b
+    """
+
+    def separate_RGB_Channels(self):
+
+        img = cv2.imread("C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\gray.bmp", 1)
+
+        px = img[100, 100]
+        print(px)
+
+
 
     def generate_thumbnail(self, _img, first = False):
         """Generate image data using PIL
