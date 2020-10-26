@@ -70,10 +70,16 @@ class Image:
     """
 
     def separate_RGB_Channels(self, _img):
-        print(_img.getImage())
+        img = self.getImage()
+
+        # Converte a imagem para 'RGB'
+        rgb_img = img.convert('RGB')
+        
+        # Lê a imagem com Open CV
         img = cv2.imread(_img.getFileName(), 3)
 
-        px = img[100, 100]
+        # Acessa os canais RGB do pixel (0, 0)
+        px = img[0, 0]
         print(px)
 
 
