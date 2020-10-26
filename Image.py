@@ -79,6 +79,7 @@ class Image:
         width, height = rgb_img.size
         i = 0
         j = 0
+
         while i < width:
             while j < height:
                 # Separa os canais RGBs em listas (com PIL)
@@ -86,6 +87,7 @@ class Image:
                 g.append(rgb_img.getpixel((i, j))[1])
                 b.append(rgb_img.getpixel((i, j))[2])
                 j+=1
+            j=0
             i+=1
 
         self.setRedChannel(r)
@@ -94,11 +96,9 @@ class Image:
 
     def generate_thumbnail(self, _img, first = False):
         """Generate image data using PIL
-        """    
-        arr = np.dstack((_img.getRedChannel(), _img.getGreenChannel(), _img.getBlueChannel())) .astype(np.uint8)
-
+        """
         maxsize = (320, 320)
-        img = pil.frombytes('RGB', maxsize, arr)
+        img = pil.fromarray(_img, 'RGB')
         img.thumbnail(maxsize)
 
         if first:                     # tkinter is inactive the first time
@@ -107,7 +107,7 @@ class Image:
             del img
             return bio.getvalue()
             
-        del maxsize, arr
+        del maxsize
         return ImageTk.PhotoImage(img)
 
     def apply_operations(self, _img1, _img2, _ops):
@@ -130,52 +130,21 @@ class Image:
         return _img1
 
     def add_operation(self, _img1, _img2):
+        arr_img_result = None
+
         # Get dos canais já setados
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
-        r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
-        
-        # Soma cada canal de cada imagem (lista) com os seus respectivos
-        # EX: r[0]_img1 + r[0]_img2
-        sum_r = [sum(x) for x in it.zip_longest(r1, r2, fillvalue = 0)]
-        i = 0
-        while(i < len(sum_r)):
-            if(sum_r[i] > 255):
-                sum_r[i] = 255
-            i+=1
+        r2, g2, b2 = _img2.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
 
-        sum_g = [sum(x) for x in it.zip_longest(g1, g2, fillvalue = 0)]
-        i = 0
-        while(i < len(sum_g)):
-            if(sum_g[i] > 255):
-                sum_g[i] = 255
-            i+=1
+        temp_r = [x + y if (int(x) + int(y)) < 255 else 255 for x, y in it.zip_longest(r1, r2, fillvalue=0)]
+        temp_g = [x + y if (int(x) + int(y)) < 255 else 255 for x, y in it.zip_longest(g1, g2, fillvalue=0)]
+        temp_b = [x + y if (int(x) + int(y)) < 255 else 255 for x, y in it.zip_longest(b1, b2, fillvalue=0)]
 
-        sum_b = [sum(x) for x in it.zip_longest(b1, b2, fillvalue = 0)]
-        i = 0
-        while(i < len(sum_b)):
-            if(sum_b[i] > 255):
-                sum_b[i] = 255
-            i+=1
+        arr_img_result = np.dstack([temp_r, temp_g, temp_b])
+        arr_img_result = np.asarray(arr_img_result)
+        arr_img_result = arr_img_result.reshape(512, 512, 3)
 
-        # Seta os novos canais calculados
-        img_temp = Image()
-        img_temp.setRedChannel(sum_r)
-        img_temp.setGreenChannel(sum_g)
-        img_temp.setBlueChannel(sum_b)
-
-        # Desaloca as variaveis
-        del r1, r2, sum_r, g1, g2, sum_g, b1, b2, sum_b
-
-        # Retorno do novo objeto Image
-        return img_temp
-
-    """
-        i = 0
-        while i < len(sum_r):
-            print(r1[i], r2[i], sum_r[i], g1[i], g2[i], sum_g[i], b1[i], b2[i], sum_b[i])
-            os.system("PAUSE")
-            i+=1
-    """
+        return arr_img_result
 
     def sub_operation(_img1, _img2):
         print("Subtração")
