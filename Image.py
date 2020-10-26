@@ -69,9 +69,9 @@ class Image:
         del img, rgb_img, r, g, b
     """
 
-    def separate_RGB_Channels(self):
-
-        img = cv2.imread("C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\gray.bmp", 1)
+    def separate_RGB_Channels(self, _img):
+        print(_img.getImage())
+        img = cv2.imread(_img.getImage())
 
         px = img[100, 100]
         print(px)

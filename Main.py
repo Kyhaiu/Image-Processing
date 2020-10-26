@@ -52,9 +52,10 @@ class Main:
 
     # Função que faz a leitura das imagens
     def ReadImage(self, path):
+        replace_path = path.replace("/", "\\\\")
         image = img.Image()
-        image.setImage(path)
-        image.separate_RGB_Channels()
+        image.setImage(replace_path)
+        image.separate_RGB_Channels(image)
         return image
 
 main = Main()
