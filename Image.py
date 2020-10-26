@@ -74,15 +74,23 @@ class Image:
 
         # Converte a imagem para 'RGB'
         rgb_img = img.convert('RGB')
-        
-        # Lê a imagem com Open CV
-        img = cv2.imread(_img.getFileName(), 3)
 
-        # Acessa os canais RGB do pixel (0, 0)
-        px = img[0, 0]
-        print(px)
+        r, g, b =  [], [], []
+        width, height = rgb_img.size
+        i = 0
+        j = 0
+        while i < width:
+            while j < height:
+                # Separa os canais RGBs em listas (com PIL)
+                r.append(rgb_img.getpixel((i, j))[0])
+                g.append(rgb_img.getpixel((i, j))[1])
+                b.append(rgb_img.getpixel((i, j))[2])
+                j+=1
+            i+=1
 
-
+        self.setRedChannel(r)
+        self.setGreenChannel(g)
+        self.setBlueChannel(b)
 
     def generate_thumbnail(self, _img, first = False):
         """Generate image data using PIL
@@ -90,7 +98,7 @@ class Image:
         arr = np.dstack((_img.getRedChannel(), _img.getGreenChannel(), _img.getBlueChannel())) .astype(np.uint8)
 
         maxsize = (320, 320)
-        img = pil.frombytes('L', maxsize, arr)
+        img = pil.frombytes('RGB', maxsize, arr)
         img.thumbnail(maxsize)
 
         if first:                     # tkinter is inactive the first time
