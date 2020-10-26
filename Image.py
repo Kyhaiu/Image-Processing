@@ -35,6 +35,7 @@ class Image:
         self.filename = _filename
     
     def setResolution(self, _resolution):
+        #Resolução da imagem (width, height)
         self.resolution = _resolution
 
     def setRedChannel(self, _redChannel):
@@ -46,29 +47,6 @@ class Image:
     def setBlueChannel(self, _blueChannel):
         self.blueChannel = _blueChannel
 
-    """
-    def separate_RGB_Channels(self):
-        img = self.getImage()
-
-        # Converte a imagem para 'RGB'
-        rgb_img = img.convert('RGB')
-
-        # Passa a imagem rgb para um array
-        arr = np.array(rgb_img)
-
-        # Separa os 3 canais com o split
-        r, g, b = np.split(arr, 3, axis = 2)
-        r = r.reshape(-1)
-        g = r.reshape(-1)
-        b = r.reshape(-1)
-        self.setRedChannel(r)
-        self.setGreenChannel(g)
-        self.setBlueChannel(b)
-
-        #Desaloca as variaveis
-        del img, rgb_img, r, g, b
-    """
-
     def separate_RGB_Channels(self, _img):
         img = self.getImage()
 
@@ -77,6 +55,7 @@ class Image:
 
         r, g, b =  [], [], []
         width, height = rgb_img.size
+        self.setResolution((width, height))
         i = 0
         j = 0
 
@@ -98,7 +77,12 @@ class Image:
         """Generate image data using PIL
         """
         maxsize = (320, 320)
-        img = pil.fromarray(_img, 'RGB')
+        #img = pil.fromarray(_img, 'RGB')
+        img = pil.frombytes('RGB', (512, 512), _img, decoder_name="raw")
+        #img = pil.frombuffer('RGB', (512, 512), _img)
+        img = img.transpose(pil.TRANSPOSE)
+        img.show()
+        img.save('teste.bmp')
         img.thumbnail(maxsize)
 
         if first:                     # tkinter is inactive the first time
@@ -109,6 +93,14 @@ class Image:
             
         del maxsize
         return ImageTk.PhotoImage(img)
+
+    def normalize(self, r, g, b):
+        maxR, maxG, maxB = max(r), max(g), max(b)
+        auxR = [np.uint8((i/maxR)*255) for i in r]
+        auxG = [np.uint8((i/maxG)*255) for i in g]
+        auxB = [np.uint8((i/maxB)*255) for i in b]
+        del maxR, maxG, maxB
+        return (auxR, auxG, auxB)
 
     def apply_operations(self, _img1, _img2, _ops):
         img_temp = Image()
@@ -134,15 +126,19 @@ class Image:
 
         # Get dos canais já setados
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
-        r2, g2, b2 = _img2.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
+        r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [x + y if (int(x) + int(y)) < 255 else 255 for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [x + y if (int(x) + int(y)) < 255 else 255 for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [x + y if (int(x) + int(y)) < 255 else 255 for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) + int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
+        temp_g = [int(x) + int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
+        temp_b = [int(x) + int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+
+        temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
-        arr_img_result = arr_img_result.reshape(512, 512, 3)
+        
+        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+
 
         return arr_img_result
 
