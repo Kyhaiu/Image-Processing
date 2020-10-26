@@ -71,7 +71,7 @@ class Image:
 
     def separate_RGB_Channels(self, _img):
         print(_img.getImage())
-        img = cv2.imread(_img.getImage())
+        img = cv2.imread(_img.getFileName(), 3)
 
         px = img[100, 100]
         print(px)

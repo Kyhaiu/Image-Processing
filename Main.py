@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 import Screen as sc
 import Image  as img
 import PySimpleGUI as sg
@@ -55,6 +56,7 @@ class Main:
         replace_path = path.replace("/", "\\\\")
         image = img.Image()
         image.setImage(replace_path)
+        image.setFileName(os.path.basename(replace_path))
         image.separate_RGB_Channels(image)
         return image
 
