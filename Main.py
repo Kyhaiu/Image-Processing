@@ -24,27 +24,29 @@ class Main:
         window = screen.getScreen()
         while True:
             event, values = window.read()
-
+            
             # Leitura das imagens
-            if event == 'folderImg1':
-                self.imgs[0] = self.ReadImage(values['folderImg1'])
-            elif event == 'folderImg2':
-                self.imgs[1] = self.ReadImage(values['folderImg2'])
+            if event == '-FILEBROWSE1-':
+                self.imgs[0] = self.ReadImage(values['-FILEBROWSE1-'])
+                thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True, isfile=True)
+                screen.updateLayoutComponents('thumbnail_image_1', thumb)
+            elif event == '-FILEBROWSE2-':
+                self.imgs[1] = self.ReadImage(values['-FILEBROWSE2-'])
+                thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True, isfile=True)
+                screen.updateLayoutComponents('thumbnail_image_2', thumb)      
 
             if self.imgs[0] and self.imgs[1] != None:
                 if event == '-APPLYOP-':
                     aux = img.Image()
                     operations = values
 
-                    for i in range(1, 3, 1):
-                        del operations['folderImg' + str(i)]
-                        del operations['file' + str(i)]
+                    del operations['-FILEBROWSE1-'], operations['-FILEBROWSE2-'], operations['Abrir Imagem'], operations['Abrir Imagem0']
 
                     self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
 
-                    thumb = aux.generate_thumbnail(self.imgs[2], True)
+                    thumb = aux.generate_thumbnail(self.imgs[2], first=True)
 
-                    screen.updateLayoutComponents('thumbnail', thumb)
+                    screen.updateLayoutComponents('thumbnail_image_result', thumb)
                     del operations, aux
 
             if event == sg.WIN_CLOSED:

@@ -72,26 +72,36 @@ class Image:
         self.setGreenChannel(g)
         self.setBlueChannel(b)
 
-    def generate_thumbnail(self, _img, first = False):
+    def generate_thumbnail(self, _img, first = False, isfile=False):
         """Generate image data using PIL
         """
         maxsize = (320, 320)
-        #img = pil.fromarray(_img, 'RGB')
-        img = pil.frombytes('RGB', (512, 512), _img, decoder_name="raw")
-        #img = pil.frombuffer('RGB', (512, 512), _img)
-        img = img.transpose(pil.TRANSPOSE)
-        img.show()
-        img.save('teste.bmp')
-        img.thumbnail(maxsize)
+        if isfile:
+            img = _img.getImage()
+            img.thumbnail(maxsize)
+            if first:                     # tkinter is inactive the first time
+                bio = io.BytesIO()
+                img.save(bio, format="PNG")
+                del img
+                return bio.getvalue()
 
-        if first:                     # tkinter is inactive the first time
-            bio = io.BytesIO()
-            img.save(bio, format="PNG")
-            del img
-            return bio.getvalue()
+            return ImageTk.PhotoImage(img)
+        else:
+            #img = pil.fromarray(_img, 'RGB')
+            img = pil.frombytes('RGB', (512, 512), _img, decoder_name="raw")
+            #img = pil.frombuffer('RGB', (512, 512), _img)
+            img = img.transpose(pil.TRANSPOSE)
+            #img.show()
+            #img.save('teste.bmp')
+            img.thumbnail(maxsize)
+
+            if first:                     # tkinter is inactive the first time
+                bio = io.BytesIO()
+                img.save(bio, format="PNG")
+                del img
+                return bio.getvalue()
             
-        del maxsize
-        return ImageTk.PhotoImage(img)
+            return ImageTk.PhotoImage(img)
 
     def normalize(self, r, g, b):
         fmax, fmin = max(max(r), max(g), max(b)), min(min(r), min(g), min(b))
