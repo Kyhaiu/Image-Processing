@@ -116,6 +116,8 @@ class Image:
             img_temp = self.and_operation(_img1, _img2)
         elif _ops['-OR-']:
             img_temp = self.or_operation(_img1, _img2)
+        elif _ops['-XOR-']:
+            img_temp = self.xor_operation(_img1)
         elif _ops['-NOT-']:
             img_temp = self.not_operation(_img1)
         return img_temp
@@ -239,6 +241,9 @@ class Image:
         arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
+
+    def xor_operation(self, _img1, _img2):
+        print("XOR")
 
     def not_operation(self, _img1):
         print("NOT")

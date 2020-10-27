@@ -14,8 +14,8 @@ class Screen:
         col2 = [[sg.Text('Operações Aritméticas', size=(17, 1)), sg.Text('Operações Lógicas')],
                 [sg.Radio('Adição',        'radioOP', default=True,  key='-ADD-', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='-AND-')],
                 [sg.Radio('Subtração',     'radioOP', default=False, key='-SUB-', size=(15, 1)), sg.Radio('OU lógico',  'radioOP', default=False, key='-OR-' )],
-                [sg.Radio('Multiplicação', 'radioOP', default=False, key='-MUL-', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='-NOT-')],
-                [sg.Radio('Divisão',       'radioOP', default=False, key='-DIV-', size=(15, 1))],
+                [sg.Radio('Multiplicação', 'radioOP', default=False, key='-MUL-', size=(15, 1)), sg.Radio('XOR lógico', 'radioOP', default=False, key='-XOR-')],
+                [sg.Radio('Divisão',       'radioOP', default=False, key='-DIV-', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='-NOT-')],
                 [sg.Button('Aplicar operação', key='-APPLYOP-'), sg.Button('DEGUB COMPONENTS')]]
         
         col3 = [[sg.Text('Imagem resultado', size=(20, 1))], [sg.Image(data=None, size=(320, 320), key='thumbnail')]]
