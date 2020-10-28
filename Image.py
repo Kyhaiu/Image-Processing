@@ -140,16 +140,15 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) + int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) + int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) + int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) + int(y) for x, y in zip(r1, r2)]
+        temp_g = [int(x) + int(y) for x, y in zip(g1, g2)]
+        temp_b = [int(x) + int(y) for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
-
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
@@ -160,16 +159,16 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) - int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) - int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) - int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) - int(y) for x, y in zip(r1, r2)]
+        temp_g = [int(x) - int(y) for x, y in zip(g1, g2)]
+        temp_b = [int(x) - int(y) for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
 
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
@@ -180,16 +179,16 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) * int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) * int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) * int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) * int(y) for x, y in zip(r1, r2)]
+        temp_g = [int(x) * int(y) for x, y in zip(g1, g2)]
+        temp_b = [int(x) * int(y) for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
 
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
@@ -200,16 +199,16 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) / int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) / int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) / int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) / int(y) if (int(y) > 0 ) else int(x) / 1 for x, y in zip(r1, r2)]
+        temp_g = [int(x) / int(y) if (int(y) > 0 ) else int(x) / 1 for x, y in zip(g1, g2)]
+        temp_b = [int(x) / int(y) if (int(y) > 0 ) else int(x) / 1 for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
 
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
@@ -220,16 +219,16 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) and int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) and int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) and int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) and int(y) for x, y in zip(r1, r2)]
+        temp_g = [int(x) and int(y) for x, y in zip(g1, g2)]
+        temp_b = [int(x) and int(y) for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
 
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
@@ -240,16 +239,16 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) or int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) or int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) or int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) or int(y) for x, y in zip(r1, r2)]
+        temp_g = [int(x) or int(y) for x, y in zip(g1, g2)]
+        temp_b = [int(x) or int(y) for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
 
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
@@ -260,16 +259,16 @@ class Image:
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         r2, g2, b2 = _img2.getRedChannel(), _img2.getGreenChannel(), _img2.getBlueChannel()
 
-        temp_r = [int(x) ^ int(y) for x, y in it.zip_longest(r1, r2, fillvalue=0)]
-        temp_g = [int(x) ^ int(y) for x, y in it.zip_longest(g1, g2, fillvalue=0)]
-        temp_b = [int(x) ^ int(y) for x, y in it.zip_longest(b1, b2, fillvalue=0)]
+        temp_r = [int(x) ^ int(y) for x, y in zip(r1, r2)]
+        temp_g = [int(x) ^ int(y) for x, y in zip(g1, g2)]
+        temp_b = [int(x) ^ int(y) for x, y in zip(b1, b2)]
 
         temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
 
         arr_img_result = np.dstack([temp_r, temp_g, temp_b])
         arr_img_result = np.asarray(arr_img_result)
 
-        arr_img_result = arr_img_result.reshape(max(_img1.getResolution()[0], _img2.getResolution()[0]), max(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
+        arr_img_result = arr_img_result.reshape(min(_img1.getResolution()[0], _img2.getResolution()[0]), min(_img1.getResolution()[1], _img2.getResolution()[1]), 3)
 
         return arr_img_result
 
