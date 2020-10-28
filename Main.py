@@ -28,11 +28,11 @@ class Main:
             # Leitura das imagens
             if event == '-FILEBROWSE1-':
                 self.imgs[0] = self.ReadImage(values['-FILEBROWSE1-'])
-                thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True, isfile=True)
+                thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
                 screen.updateLayoutComponents('thumbnail_image_1', thumb)
             elif event == '-FILEBROWSE2-':
                 self.imgs[1] = self.ReadImage(values['-FILEBROWSE2-'])
-                thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True, isfile=True)
+                thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
                 screen.updateLayoutComponents('thumbnail_image_2', thumb)      
 
             if self.imgs[0] and self.imgs[1] != None:

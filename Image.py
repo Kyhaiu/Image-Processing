@@ -1,5 +1,6 @@
 import io
 import os
+import math
 import numpy as np
 import itertools as it
 from PIL import Image as pil
@@ -27,8 +28,13 @@ class Image:
     def getBlueChannel(self):
         return self.blueChannel
     
-    def setImage(self, _filename):
-        self.image = pil.open(_filename)
+    def setImage(self, _filename=None, from_file=True):
+        if not(from_file):
+            #in this case filename, is the PIL Image Object
+            self.image = _filename
+        else:
+            #otherwise filename is just filename
+            self.image = pil.open(_filename)
 
     def setFileName(self, _filename):
         self.filename = _filename
@@ -72,44 +78,39 @@ class Image:
         self.setGreenChannel(g)
         self.setBlueChannel(b)
 
-    def generate_thumbnail(self, _img, first = False, isfile=False):
+    def generate_thumbnail(self, _img, first = False):
         """Generate image data using PIL
         """
         maxsize = (320, 320)
-        if isfile:
-            img = _img.getImage()
-            img.thumbnail(maxsize)
-            if first:                     # tkinter is inactive the first time
-                bio = io.BytesIO()
-                img.save(bio, format="PNG")
-                del img
-                return bio.getvalue()
+        img = _img.getImage()
+        img.thumbnail(maxsize)
+        if first:                     # tkinter is inactive the first time
+            bio = io.BytesIO()
+            img.save(bio, format="PNG")
+            del img
+            return bio.getvalue()
 
-            return ImageTk.PhotoImage(img)
-        else:
-            #img = pil.fromarray(_img, 'RGB')
-            img = pil.frombytes('RGB', (512, 512), _img, decoder_name="raw")
-            #img = pil.frombuffer('RGB', (512, 512), _img)
-            img = img.transpose(pil.TRANSPOSE)
-            #img.show()
-            #img.save('teste.bmp')
-            img.thumbnail(maxsize)
-
-            if first:                     # tkinter is inactive the first time
-                bio = io.BytesIO()
-                img.save(bio, format="PNG")
-                del img
-                return bio.getvalue()
-            
-            return ImageTk.PhotoImage(img)
+        return ImageTk.PhotoImage(img)
 
     def normalize(self, r, g, b):
         fmax, fmin = max(max(r), max(g), max(b)), min(min(r), min(g), min(b))
-        auxR = [np.uint8(((255/(fmax - fmin))*(i - fmin))) for i in r]
-        auxG = [np.uint8(((255/(fmax - fmin))*(i - fmin))) for i in g]
-        auxB = [np.uint8(((255/(fmax - fmin))*(i - fmin))) for i in b]
+        faux = 0
+        if (fmax - fmin) <= 0:
+            faux = 1
+        else:
+            faux = fmax - fmin
+        auxR = [np.uint8(((255/(faux))*(i - fmin))) for i in r]
+        auxG = [np.uint8(((255/(faux))*(i - fmin))) for i in g]
+        auxB = [np.uint8(((255/(faux))*(i - fmin))) for i in b]
         del fmin, fmax
         return (auxR, auxG, auxB)
+
+    def create_img_from_matrix(self, _matrix):
+        img = Image()
+        img.setImage(pil.frombytes('RGB', (_matrix.shape[0], _matrix.shape[1]), _matrix, decoder_name="raw").transpose(pil.TRANSPOSE), from_file=False)
+        img.setResolution(img.getImage().size)
+        img.separate_RGB_Channels(img)
+        return img
 
     def apply_operations(self, _img1, _img2, _ops):
         img_temp = Image()
@@ -129,6 +130,7 @@ class Image:
             img_temp = self.xor_operation(_img1, _img2)
         elif _ops['-NOT-']:
             img_temp = self.not_operation(_img1)
+        img_temp = self.create_img_from_matrix(img_temp)
         return img_temp
 
     def add_operation(self, _img1, _img2):
