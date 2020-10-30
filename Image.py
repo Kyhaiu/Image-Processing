@@ -128,8 +128,9 @@ class Image:
             img_temp = self.or_operation(_img1, _img2)
         elif _ops['-XOR-']:
             img_temp = self.xor_operation(_img1, _img2)
-        elif _ops['-NOT-']:
+        elif _ops['-NOT-'] or _ops['-NOT-IMG1-'] or _ops['-NOT-IMG2-']:
             img_temp = self.not_operation(_img1)
+
         img_temp = self.create_img_from_matrix(img_temp)
         return img_temp
 
@@ -272,5 +273,38 @@ class Image:
 
         return arr_img_result
 
-    def not_operation(self, _img1):
-        print("NOT")
+    def not_operation(self, _img1, isinput=False):
+        arr_img_result = None
+
+        # Get dos canais já setados
+        r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
+        width, height = _img1.getResolution()[0], _img1.getResolution()[1]
+
+        if isinput:
+            temp_r = [~x for x in r1]
+            temp_g = [~x for x in g1]
+            temp_b = [~x for x in b1]
+
+            temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
+
+            arr_img_result = np.dstack([temp_r, temp_g, temp_b])
+            arr_img_result = np.asarray(arr_img_result)
+
+            arr_img_result = arr_img_result.reshape(width, height, 3)
+
+            arr_img_result =  self.create_img_from_matrix(arr_img_result)
+        else:
+            
+
+            temp_r = [~x for x in r1]
+            temp_g = [~x for x in g1]
+            temp_b = [~x for x in b1]
+
+            temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
+
+            arr_img_result = np.dstack([temp_r, temp_g, temp_b])
+            arr_img_result = np.asarray(arr_img_result)
+
+            arr_img_result = arr_img_result.reshape(width, height, 3)
+
+        return arr_img_result

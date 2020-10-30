@@ -33,9 +33,22 @@ class Main:
             elif event == '-FILEBROWSE2-':
                 self.imgs[1] = self.ReadImage(values['-FILEBROWSE2-'])
                 thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
-                screen.updateLayoutComponents('thumbnail_image_2', thumb)      
+                screen.updateLayoutComponents('thumbnail_image_2', thumb)
+
+            if event == '-NOT-IMG1-' and self.imgs[0] != None:
+                    aux = img.Image()
+                    self.imgs[0] = aux.not_operation(self.imgs[0], isinput=True)
+                    thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
+                    screen.updateLayoutComponents('thumbnail_image_1', thumb)
+            elif event == '-NOT-IMG2-' and self.imgs[1] != None:
+                aux = img.Image()
+                self.imgs[1] = aux.not_operation(self.imgs[1], isinput=True)
+                thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
+                screen.updateLayoutComponents('thumbnail_image_2', thumb)
 
             if self.imgs[0] and self.imgs[1] != None:
+                aux = None
+
                 if event == '-APPLYOP-':
                     aux = img.Image()
                     operations = values
