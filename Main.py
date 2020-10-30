@@ -55,7 +55,10 @@ class Main:
 
                     del operations['-FILEBROWSE1-'], operations['-FILEBROWSE2-'], operations['Abrir Imagem'], operations['Abrir Imagem0']
 
-                    self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
+                    if values['-NOT-']:
+                        self.imgs[2] = aux.apply_operations(self.imgs[2], None, operations)
+                    else:
+                        self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
 
                     thumb = aux.generate_thumbnail(self.imgs[2], first=True)
 
