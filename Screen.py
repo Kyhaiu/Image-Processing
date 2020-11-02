@@ -15,21 +15,30 @@ class Screen:
                             [sg.FileBrowse(button_text='Abrir Imagem', target='-FILEBROWSE2-', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2'),
                              sg.Checkbox('Not', default=False, key='-NOT-IMG2-', enable_events=True, pad=((178, 0), (0, 0)))]
                         ]
+        frame3_logical_operation_layout = [
+                                            [sg.Radio('E lógico',   'radioOP', default=False, key='-AND-')],
+                                            [sg.Radio('OU lógico',  'radioOP', default=False, key='-OR-' )],
+                                            [sg.Radio('XOR lógico', 'radioOP', default=False, key='-XOR-')],
+                                            [sg.Radio('Negação',    'radioOP', default=False, key='-NOT-')]
+                                          ]
+        frame3_arithmetic_operation_layout = [
+                                                [sg.Radio('Adição',        'radioOP', default=True,  key='-ADD-', size=(15, 1))],
+                                                [sg.Radio('Subtração',     'radioOP', default=False, key='-SUB-', size=(15, 1))],
+                                                [sg.Radio('Multiplicação', 'radioOP', default=False, key='-MUL-', size=(15, 1))],
+                                                [sg.Radio('Divisão',       'radioOP', default=False, key='-DIV-', size=(15, 1))]
+                                             ]
         frame3_layout = [
-                            [sg.Radio('Adição',        'radioOP', default=True,  key='-ADD-', size=(15, 1)), sg.Radio('E lógico',   'radioOP', default=False, key='-AND-')],
-                            [sg.Radio('Subtração',     'radioOP', default=False, key='-SUB-', size=(15, 1)), sg.Radio('OU lógico',  'radioOP', default=False, key='-OR-' )],
-                            [sg.Radio('Multiplicação', 'radioOP', default=False, key='-MUL-', size=(15, 1)), sg.Radio('XOR lógico', 'radioOP', default=False, key='-XOR-')],
-                            [sg.Radio('Divisão',       'radioOP', default=False, key='-DIV-', size=(15, 1)), sg.Radio('Negação',    'radioOP', default=False, key='-NOT-')],
-                            [sg.Button('Aplicar operação', key='-APPLYOP-')]
+                            [sg.Frame('Aritiméticas', frame3_arithmetic_operation_layout), sg.Frame('Lógicas', frame3_logical_operation_layout)],
+                            [sg.Input(key='-FILESAVE-', enable_events=True, visible=False), 
+                             sg.Button('Aplicar operação', key='-APPLYOP-'), sg.FileSaveAs('Salvar Imagem', file_types=(("Bmp Files", "*.bmp"),), key='-SAVE-', target='-FILESAVE-')]
                         ]
         frame4_layout = [
-                            [sg.Image(data=None, size=(320, 320), key='thumbnail_image_result')],
-                            [sg.Button('SALVAR')]
+                            [sg.Image(data=None, size=(320, 320), key='thumbnail_image_result')]
                         ]
         
         layout = [
                     [sg.Frame('Imagem 1', frame1_layout),          sg.Frame('Imagem 2',  frame2_layout)],
-                    [sg.Frame('Operações Lógicas', frame3_layout, size=(320, 320)), sg.Frame('Resultado', frame4_layout)]
+                    [sg.Frame('Operações', frame3_layout, size=(320, 320)), sg.Frame('Resultado', frame4_layout)]
                  ]
         #aux = [[sg.Column(col1), sg.Column(col2)], [sg.Column(col3)]]
 

@@ -53,6 +53,7 @@ class Main:
                     aux = img.Image()
                     operations = values
 
+
                     del operations['-FILEBROWSE1-'], operations['-FILEBROWSE2-'], operations['Abrir Imagem'], operations['Abrir Imagem0']
 
                     if values['-NOT-']:
@@ -64,7 +65,19 @@ class Main:
 
                     screen.updateLayoutComponents('thumbnail_image_result', thumb)
                     del operations, aux
-
+            
+            if event == "-FILESAVE-":
+                path = values['-SAVE-']
+                extension = path[int(len(path)-4): len(path)+1 :]
+                if extension != '.bmp':
+                    #if the user inform a invalid file extension, then program returns a error alert
+                    sg.popup_error('Erro!', 'Por favor Salve o arquivo resultado com o formato .bmp')
+                    continue
+                elif path == '':
+                    #if the user clicks in the button Cancel
+                    continue
+                #otherwise save file as *.bmp usualy
+                self.imgs[2].getImage().save(path)
             if event == sg.WIN_CLOSED:
                 break
         window.close()
