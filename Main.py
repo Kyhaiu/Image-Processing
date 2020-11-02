@@ -4,6 +4,7 @@ import Screen as sc
 import Image  as img
 import PySimpleGUI as sg
 import numpy as np
+import copy
 
 class Main:
     """
@@ -61,11 +62,13 @@ class Main:
                     else:
                         self.imgs[2] = aux.apply_operations(self.imgs[0], self.imgs[1], operations)
 
-                    thumb = aux.generate_thumbnail(self.imgs[2], first=True)
+                    img_temp = copy.deepcopy(self.imgs[2])
+                    thumb = aux.generate_thumbnail(img_temp, first=True)
 
                     screen.updateLayoutComponents('thumbnail_image_result', thumb)
-                    del operations, aux
-            
+                    del operations, aux, thumb
+
+
             if event == "-FILESAVE-":
                 path = values['-SAVE-']
                 extension = path[int(len(path)-4): len(path)+1 :]
@@ -77,7 +80,9 @@ class Main:
                     #if the user clicks in the button Cancel
                     continue
                 #otherwise save file as *.bmp usualy
+                print(self.imgs[2].getImage().size)
                 self.imgs[2].getImage().save(path)
+
             if event == sg.WIN_CLOSED:
                 break
         window.close()
@@ -87,6 +92,7 @@ class Main:
         replace_path = path.replace("/", "\\\\")
         image = img.Image()
         image.setImage(replace_path)
+        image.setMode(image.getImage().mode)
         image.setFileName(os.path.basename(replace_path))
         image.separate_RGB_Channels(image)
         return image

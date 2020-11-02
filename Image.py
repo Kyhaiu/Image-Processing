@@ -19,6 +19,9 @@ class Image:
     def getResolution(self):
         return self.resolution
 
+    def getMode(self):
+        return self.mode
+
     def getRedChannel(self):
         return self.redChannel
 
@@ -42,6 +45,18 @@ class Image:
     def setResolution(self, _resolution):
         #Resolução da imagem (width, height)
         self.resolution = _resolution
+
+    def setMode(self, _mode):
+        if _mode == '1':
+            self.mode = (1, '1')
+        elif _mode == 'L':
+            self.mode = (8, 'Grayscale')
+        elif _mode == 'P':
+            self.mode = (8, 'Colorful')
+        elif _mode == 'RGB' or 'RGBA' or 'CMYK' or 'LAB':
+            self.mode('24', 'True Color')
+        elif _mode == 'HSV':
+            pass
 
     def setRedChannel(self, _redChannel):
         self.redChannel = _redChannel
