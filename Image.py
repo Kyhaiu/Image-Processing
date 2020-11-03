@@ -38,6 +38,7 @@ class Image:
         else:
             #otherwise filename is just filename
             self.image = pil.open(_filename)
+            print(self.image)
 
     def setFileName(self, _filename):
         self.filename = _filename
@@ -47,6 +48,7 @@ class Image:
         self.resolution = _resolution
 
     def setMode(self, _mode):
+        #salva uma tupla contendo a qtd de bits usados na resolução de cores e a string que representa o modo(ver Mode in Pillow)
         if _mode == '1':
             self.mode = (1, '1')
         elif _mode == 'L':
@@ -118,11 +120,21 @@ class Image:
         del fmin, fmax
         return (auxR, auxG, auxB)
 
-    def create_img_from_matrix(self, _matrix):
+    def create_img_from_matrix(self, _matrix, _img1, _img2):
+        #funcção que cria uma imagem a partir de uma matrix de pixels
+        #lembrando que a operação not, seja nos inputs ou resultado são criados a partir de valores da memoria
         img = Image()
-
-        img.setImage(pil.frombytes('RGB', (_matrix.shape[0], _matrix.shape[1]), _matrix, decoder_name="raw").transpose(pil.TRANSPOSE), from_file=False)
-        img.setMode((24, 'RGB'))        
+        depth_img_1 = _img1.getMode()
+        depth_img_2 = _img2.getMode()
+        
+        #Ele verifica qual é a maior resolução de cores e salva a img resultante conforme a maior resolução
+        if depth_img_1[0] >= depth_img_2[0]:
+            img.setImage(pil.frombytes('RGB', (_matrix.shape[0], _matrix.shape[1]), _matrix, decoder_name="raw").transpose(pil.TRANSPOSE).convert(depth_img_1[1]), from_file=False)
+            img.setMode(depth_img_1[1]) 
+        else:
+            img.setImage(pil.frombytes('RGB', (_matrix.shape[0], _matrix.shape[1]), _matrix, decoder_name="raw").transpose(pil.TRANSPOSE).convert(depth_img_2[1]), from_file=False)
+            img.setMode(depth_img_2[1]) 
+               
         img.setResolution(img.getImage().size)
         img.separate_RGB_Channels(img)
 
@@ -147,7 +159,7 @@ class Image:
         elif _ops['-NOT-'] or _ops['-NOT-IMG1-'] or _ops['-NOT-IMG2-']:
             img_temp = self.not_operation(_img1)
 
-        img_temp = self.create_img_from_matrix(img_temp)
+        img_temp = self.create_img_from_matrix(img_temp, _img1, _img2)
         return img_temp
 
     def add_operation(self, _img1, _img2):
@@ -290,37 +302,26 @@ class Image:
         return arr_img_result
 
     def not_operation(self, _img1, isinput=False):
+        #operação NOT, usanda tanto para as imagens inputs, quanto no resultado
+        #parametro isinput serve como flag para ver se não é o NOT das IMG 1 ou IMG2
         arr_img_result = None
 
         # Get dos canais já setados
         r1, g1, b1 = _img1.getRedChannel(), _img1.getGreenChannel(), _img1.getBlueChannel()
         width, height = _img1.getResolution()[0], _img1.getResolution()[1]
 
+        temp_r = [~x for x in r1]
+        temp_g = [~x for x in g1]
+        temp_b = [~x for x in b1]
+
+        temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
+
+        arr_img_result = np.dstack([temp_r, temp_g, temp_b])
+        arr_img_result = np.asarray(arr_img_result)
+        arr_img_result = arr_img_result.reshape(width, height, 3)
+
         if isinput:
-            temp_r = [~x for x in r1]
-            temp_g = [~x for x in g1]
-            temp_b = [~x for x in b1]
 
-            temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
-
-            arr_img_result = np.dstack([temp_r, temp_g, temp_b])
-            arr_img_result = np.asarray(arr_img_result)
-
-            arr_img_result = arr_img_result.reshape(width, height, 3)
-
-            arr_img_result =  self.create_img_from_matrix(arr_img_result)
-        else:
-            
-
-            temp_r = [~x for x in r1]
-            temp_g = [~x for x in g1]
-            temp_b = [~x for x in b1]
-
-            temp_r, temp_g, temp_b = self.normalize(temp_r, temp_g, temp_b)
-
-            arr_img_result = np.dstack([temp_r, temp_g, temp_b])
-            arr_img_result = np.asarray(arr_img_result)
-
-            arr_img_result = arr_img_result.reshape(width, height, 3)
+            arr_img_result =  self.create_img_from_matrix(arr_img_result, _img1, _img1)
 
         return arr_img_result
