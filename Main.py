@@ -93,6 +93,7 @@ class Main:
         image = img.Image()
         image.setImage(replace_path)
         image.setMode(image.getImage().mode)
+        image.setResolution(image.getImage().size)
         image.setFileName(os.path.basename(replace_path))
         image.separate_RGB_Channels(image)
         return image

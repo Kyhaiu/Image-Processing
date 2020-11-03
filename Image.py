@@ -50,13 +50,11 @@ class Image:
         if _mode == '1':
             self.mode = (1, '1')
         elif _mode == 'L':
-            self.mode = (8, 'Grayscale')
+            self.mode = (8, 'L')
         elif _mode == 'P':
-            self.mode = (8, 'Colorful')
-        elif _mode == 'RGB' or 'RGBA' or 'CMYK' or 'LAB':
-            self.mode('24', 'True Color')
-        elif _mode == 'HSV':
-            pass
+            self.mode = (8, 'P')
+        elif _mode == 'RGB':
+            self.mode = (24, 'RGB')
 
     def setRedChannel(self, _redChannel):
         self.redChannel = _redChannel
@@ -122,9 +120,12 @@ class Image:
 
     def create_img_from_matrix(self, _matrix):
         img = Image()
+
         img.setImage(pil.frombytes('RGB', (_matrix.shape[0], _matrix.shape[1]), _matrix, decoder_name="raw").transpose(pil.TRANSPOSE), from_file=False)
+        img.setMode((24, 'RGB'))        
         img.setResolution(img.getImage().size)
         img.separate_RGB_Channels(img)
+
         return img
 
     def apply_operations(self, _img1, _img2, _ops):
