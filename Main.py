@@ -28,25 +28,38 @@ class Main:
             
             # Leitura das imagens
             if event == '-FILEBROWSE1-':
-                self.imgs[0] = self.ReadImage(values['-FILEBROWSE1-'])
-                thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
-                screen.updateLayoutComponents('thumbnail_image_1', thumb)
+                if values['-FILEBROWSE1-'] == '':
+                    continue
+                else:
+                    self.imgs[0] = self.ReadImage(values['-FILEBROWSE1-'])
+                    thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
+                    screen.updateLayoutComponents('thumbnail_image_1', thumb)
             elif event == '-FILEBROWSE2-':
-                self.imgs[1] = self.ReadImage(values['-FILEBROWSE2-'])
-                thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
-                screen.updateLayoutComponents('thumbnail_image_2', thumb)
+                if values['-FILEBROWSE2-'] == '':
+                    continue
+                else:
+                    self.imgs[1] = self.ReadImage(values['-FILEBROWSE2-'])
+                    thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
+                    screen.updateLayoutComponents('thumbnail_image_2', thumb)
 
             #Caso o usuário tenha selecionado a checkbox not da img1 ou img2
             if event == '-NOT-IMG1-' and self.imgs[0] != None:
-                    aux = img.Image()
-                    self.imgs[0] = aux.not_operation(self.imgs[0], isinput=True)
-                    thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
-                    screen.updateLayoutComponents('thumbnail_image_1', thumb)
+                aux = img.Image()
+                self.imgs[0] = aux.not_operation(self.imgs[0], isinput=True)
+                thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
+                screen.updateLayoutComponents('thumbnail_image_1', thumb)
+
+            elif event == '-NOT-IMG1-' and self.imgs[0] == None:
+                window.FindElement('-NOT-IMG1-').Update(False)
+            
             elif event == '-NOT-IMG2-' and self.imgs[1] != None:
                 aux = img.Image()
                 self.imgs[1] = aux.not_operation(self.imgs[1], isinput=True)
                 thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
                 screen.updateLayoutComponents('thumbnail_image_2', thumb)
+            
+            elif event == '-NOT-IMG2-' and self.imgs[1] == None:
+                window.FindElement('-NOT-IMG2-').Update(False)
 
             #Caso as duas imagens tenham sido importadas ele executa a operação selecionada
             if self.imgs[0] and self.imgs[1] != None:
@@ -69,9 +82,18 @@ class Main:
                     thumb = aux.generate_thumbnail(img_temp, first=True)
 
                     screen.updateLayoutComponents('thumbnail_image_result', thumb)
+                    window.FindElement('-SAVE-').Update(disabled=False)
                     del operations, aux, thumb
+            elif self.imgs[0] == None and self.imgs[1] == None and event == '-APPLYOP-':
+                sg.popup_error('Erro!', 'Por favor realiza a importação da Imagem 1 e Imagem 2 antes de realizar qualquer operação!')
 
-            #caso o usuário tenha clicado em salvar e a img resultado for diferente de None
+            elif self.imgs[0] == None and event == '-APPLYOP-':
+                sg.popup_error('Erro!', 'Por favor realiza a importação da Imagem 1 antes de realizar qualquer operação!')
+
+            elif self.imgs[1] == None and event == '-APPLYOP-':
+                sg.popup_error('Erro!', 'Por favor realiza a importação da Imagem 2 antes de realizar qualquer operação!')
+
+            #caso o usuário tenha clicado em salvar e a img resultado for diferente de None 
             if event == "-FILESAVE-" and self.imgs[2] != None:
                 path = values['-SAVE-']
                 extension = path[int(len(path)-4): len(path)+1 :]
