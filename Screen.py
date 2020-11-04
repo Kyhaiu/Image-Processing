@@ -35,7 +35,8 @@ class Screen:
         frame3_layout = [
                             [sg.Frame('Aritiméticas', frame3_arithmetic_operation_layout), sg.Frame('Lógicas', frame3_logical_operation_layout)],
                             [sg.Input(key='-FILESAVE-', enable_events=True, visible=False), 
-                             sg.Button('Aplicar operação', key='-APPLYOP-'), sg.FileSaveAs('Salvar Imagem', file_types=(("Bmp Files", "*.bmp"),), key='-SAVE-', target='-FILESAVE-', disabled=True)]
+                             sg.Button('Aplicar operação', key='-APPLYOP-'), sg.FileSaveAs('Salvar Imagem', file_types=(("Bmp Files", "*.bmp"),), key='-SAVE-', target='-FILESAVE-', disabled=True)],
+                            [sg.T(' ', font=('Helvetica', 1), size=(320, 89))]
                         ]
         frame4_layout = [
                             [sg.Image(data=None, size=(320, 320), key='thumbnail_image_result')],
