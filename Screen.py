@@ -6,16 +6,16 @@ class Screen:
         
         frame1_layout = [
                             [sg.Input(key='-FILEBROWSE1-', enable_events=True, visible=False), sg.Image(data=None, size=(320, 320), key='thumbnail_image_1')],
-                            [sg.Text(text='', key='-SIZE-IMG1-', size=(11, 1)),
-                             sg.Text(text='', key='-BIT-DEPTH-IMG1-', size=(6, 1))],
+                            [sg.Text(text='', key='-SIZE-IMG1-', size=(11, 1), tooltip='(Altura x Largura) da imagem. Unidade de medida em pixels'),
+                             sg.Text(text='', key='-BIT-DEPTH-IMG1-', size=(6, 1), tooltip='Numero de bits utilizados para representar as cores da imagem.')],
                             [sg.FileBrowse(button_text='Abrir Imagem', target='-FILEBROWSE1-', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 1 com formato .bmp e resolução de cores de 1-bit, 8-bits, 24-bits'),
                              sg.Checkbox('Not', default=False, key='-NOT-IMG1-', enable_events=True, tooltip='Aplica a operação lógica NOT na imagem 1')]
                         ]
 
         frame2_layout = [
                             [sg.Input(key='-FILEBROWSE2-', enable_events=True, visible=False), sg.Image(data=None, size=(320, 320), key='thumbnail_image_2')],
-                            [sg.Text(text='', key='-SIZE-IMG2-', size=(11, 1)),
-                             sg.Text(text='', key='-BIT-DEPTH-IMG2-', size=(6, 1))],
+                            [sg.Text(text='', key='-SIZE-IMG2-', size=(11, 1), tooltip='(Altura x Largura) da imagem. Unidade de medida em pixels'),
+                             sg.Text(text='', key='-BIT-DEPTH-IMG2-', size=(6, 1), tooltip='Numero de bits utilizados para representar as cores da imagem.')],
                             [sg.FileBrowse(button_text='Abrir Imagem', target='-FILEBROWSE2-', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2 com formato .bmp e resolução de cores de 1-bit, 8-bits, 24-bits'),
                              sg.Checkbox('Not', default=False, key='-NOT-IMG2-', enable_events=True, tooltip='Aplica a operação lógica NOT na imagem 1')]
                         ]
@@ -42,8 +42,8 @@ class Screen:
         frame4_layout = [
                             [sg.Image(data=None, size=(320, 320), key='thumbnail_image_result')],
                             [
-                                sg.Text(text='', key='-SIZE-IMG-RESULT-', size=(11, 1)),
-                                sg.Text(text='', key='-BIT-DEPTH-RESULT-', size=(6, 1))
+                                sg.Text(text='', key='-SIZE-IMG-RESULT-', size=(11, 1), tooltip='(Altura x Largura) da imagem. Unidade de medida em pixels'),
+                                sg.Text(text='', key='-BIT-DEPTH-RESULT-', size=(6, 1), tooltip='Numero de bits utilizados para representar as cores da imagem.')
                             ]
                         ]
         
