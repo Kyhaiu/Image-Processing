@@ -38,6 +38,7 @@ class Main:
                     resolution_tmp = '(' + str(self.imgs[0].getResolution()[0]) + 'x' + str(self.imgs[0].getResolution()[1]) + ')'
                     bits_tmp = str(self.imgs[0].getMode()[0]) + '-bit'
 
+                    window.FindElement('-NOT-IMG1-').Update(False)
                     window.FindElement('-SIZE-IMG1-').Update(value = resolution_tmp)
                     window.FindElement('-BIT-DEPTH-IMG1-').Update(value = bits_tmp)
             elif event == '-FILEBROWSE2-':
@@ -51,6 +52,7 @@ class Main:
                     resolution_tmp = '(' + str(self.imgs[1].getResolution()[0]) + 'x' + str(self.imgs[1].getResolution()[1]) + ')'
                     bits_tmp = str(self.imgs[1].getMode()[0]) + '-bit'
                     
+                    window.FindElement('-NOT-IMG1-').Update(False)
                     window.FindElement('-SIZE-IMG2-').Update(resolution_tmp)
                     window.FindElement('-BIT-DEPTH-IMG2-').Update(bits_tmp)
 

@@ -38,7 +38,6 @@ class Image:
         else:
             #otherwise filename is just filename
             self.image = pil.open(_filename)
-            print(self.image)
 
     def setFileName(self, _filename):
         self.filename = _filename
