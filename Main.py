@@ -34,6 +34,12 @@ class Main:
                     self.imgs[0] = self.ReadImage(values['-FILEBROWSE1-'])
                     thumb = self.imgs[0].generate_thumbnail(self.imgs[0], first=True)
                     screen.updateLayoutComponents('thumbnail_image_1', thumb)
+
+                    resolution_tmp = '(' + str(self.imgs[0].getResolution()[0]) + 'x' + str(self.imgs[0].getResolution()[1]) + ')'
+                    bits_tmp = str(self.imgs[0].getMode()[0]) + '-bit'
+
+                    window.FindElement('-SIZE-IMG1-').Update(value = resolution_tmp)
+                    window.FindElement('-BIT-DEPTH-IMG1-').Update(value = bits_tmp)
             elif event == '-FILEBROWSE2-':
                 if values['-FILEBROWSE2-'] == '':
                     continue
@@ -41,6 +47,12 @@ class Main:
                     self.imgs[1] = self.ReadImage(values['-FILEBROWSE2-'])
                     thumb = self.imgs[1].generate_thumbnail(self.imgs[1], first=True)
                     screen.updateLayoutComponents('thumbnail_image_2', thumb)
+
+                    resolution_tmp = '(' + str(self.imgs[1].getResolution()[0]) + 'x' + str(self.imgs[1].getResolution()[1]) + ')'
+                    bits_tmp = str(self.imgs[1].getMode()[0]) + '-bit'
+                    
+                    window.FindElement('-SIZE-IMG2-').Update(resolution_tmp)
+                    window.FindElement('-BIT-DEPTH-IMG2-').Update(bits_tmp)
 
             #Caso o usuário tenha selecionado a checkbox not da img1 ou img2
             if event == '-NOT-IMG1-' and self.imgs[0] != None:
@@ -81,6 +93,11 @@ class Main:
                     img_temp = copy.deepcopy(self.imgs[2])
                     thumb = aux.generate_thumbnail(img_temp, first=True)
 
+                    resolution_tmp = '(' + str(self.imgs[2].getResolution()[0]) + 'x' + str(self.imgs[2].getResolution()[1]) + ')'
+                    bits_tmp = str(self.imgs[2].getMode()[0]) + '-bit'
+                    window.FindElement('-SIZE-IMG-RESULT-').Update(resolution_tmp)
+                    window.FindElement('-BIT-DEPTH-RESULT-').Update(bits_tmp)
+
                     screen.updateLayoutComponents('thumbnail_image_result', thumb)
                     window.FindElement('-SAVE-').Update(disabled=False)
                     del operations, aux, thumb
@@ -105,8 +122,10 @@ class Main:
                 elif path == '':
                     #se o usuário clicar em salvar e decidir cancelar, isso evita da tela quebrar
                     continue
+
                 #salva a img no caminho selecioando
                 self.imgs[2].getImage().save(path)
+                #self.imgs[2].getImage().convert('RGB').save(path)
 
             if event == sg.WIN_CLOSED:
                 break

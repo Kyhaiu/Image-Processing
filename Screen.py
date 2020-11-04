@@ -6,14 +6,18 @@ class Screen:
         
         frame1_layout = [
                             [sg.Input(key='-FILEBROWSE1-', enable_events=True, visible=False), sg.Image(data=None, size=(320, 320), key='thumbnail_image_1')],
+                            [sg.Text(text='', key='-SIZE-IMG1-', size=(11, 1)),
+                             sg.Text(text='', key='-BIT-DEPTH-IMG1-', size=(6, 1))],
                             [sg.FileBrowse(button_text='Abrir Imagem', target='-FILEBROWSE1-', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 1 com formato .bmp e resolução de cores de 1-bit, 8-bits, 24-bits'),
-                             sg.Checkbox('Not', default=False, key='-NOT-IMG1-', enable_events=True, pad=((190, 0), (0, 0)), tooltip='Aplica a operação lógica NOT na imagem 1')]
+                             sg.Checkbox('Not', default=False, key='-NOT-IMG1-', enable_events=True, tooltip='Aplica a operação lógica NOT na imagem 1')]
                         ]
 
         frame2_layout = [
                             [sg.Input(key='-FILEBROWSE2-', enable_events=True, visible=False), sg.Image(data=None, size=(320, 320), key='thumbnail_image_2')],
+                            [sg.Text(text='', key='-SIZE-IMG2-', size=(11, 1)),
+                             sg.Text(text='', key='-BIT-DEPTH-IMG2-', size=(6, 1))],
                             [sg.FileBrowse(button_text='Abrir Imagem', target='-FILEBROWSE2-', file_types=(("Bmp Files", "*.bmp"),) , tooltip='Realiza a importação da imagem 2 com formato .bmp e resolução de cores de 1-bit, 8-bits, 24-bits'),
-                             sg.Checkbox('Not', default=False, key='-NOT-IMG2-', enable_events=True, pad=((178, 0), (0, 0)), tooltip='Aplica a operação lógica NOT na imagem 1')]
+                             sg.Checkbox('Not', default=False, key='-NOT-IMG2-', enable_events=True, tooltip='Aplica a operação lógica NOT na imagem 1')]
                         ]
         frame3_logical_operation_layout = [
                                             [sg.Radio('E lógico',   'radioOP', default=False, key='-AND-', tooltip='Operação logíca que compara bit-a-bit, e retorna verdadeiro quando os dois bits comparados tem valores lógicos igual a 1 \n Ex.:  --------------------------\n        | Bit 1 | Bit 2 | Bit 1 E Bit 2 | \n        | ----  | ----  | -----------  | \n        |    0    |    0    |         0          | \n        |    0    |    1    |         0          | \n        |    1    |    0    |         0          | \n        |    1    |    1    |         1          | \n         --------------------------')],
@@ -34,7 +38,11 @@ class Screen:
                              sg.Button('Aplicar operação', key='-APPLYOP-'), sg.FileSaveAs('Salvar Imagem', file_types=(("Bmp Files", "*.bmp"),), key='-SAVE-', target='-FILESAVE-', disabled=True)]
                         ]
         frame4_layout = [
-                            [sg.Image(data=None, size=(320, 320), key='thumbnail_image_result')]
+                            [sg.Image(data=None, size=(320, 320), key='thumbnail_image_result')],
+                            [
+                                sg.Text(text='', key='-SIZE-IMG-RESULT-', size=(11, 1)),
+                                sg.Text(text='', key='-BIT-DEPTH-RESULT-', size=(6, 1))
+                            ]
                         ]
         
         layout = [
@@ -61,7 +69,7 @@ class Screen:
 
     def setScreen(self, name, layout):
         sg.theme('DarkBlue1')
-        self.screen = sg.Window(name, layout, finalize=True, size=(700, 750))
+        self.screen = sg.Window(name, layout, finalize=True)
     
     def setMenu(self, _menu):
         self.menu = _menu

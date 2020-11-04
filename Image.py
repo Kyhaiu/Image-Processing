@@ -57,6 +57,8 @@ class Image:
             self.mode = (8, 'P')
         elif _mode == 'RGB':
             self.mode = (24, 'RGB')
+        elif _mode == 'RGBA':
+            self.mode = (24, 'RGBA')
 
     def setRedChannel(self, _redChannel):
         self.redChannel = _redChannel
