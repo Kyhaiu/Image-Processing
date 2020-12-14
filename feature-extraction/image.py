@@ -3,7 +3,9 @@ from PIL import Image as pil
 class image:
     #Construtor da classe
     def __init__(self, _filename):
-        pass
+        self.setFilename(_filename)
+        self.setImage(_filename)
+
     
     #retorna a instancia da imagem
     def getImage(self):
@@ -14,8 +16,11 @@ class image:
         return self.filename
 
     #cria uma instancia virtual da imagem(copia ela pra memoria)
-    def setImage(self, _filename):
-        self.image = pil.open(_filename)
+    def setImage(self, _filename, from_memory=False):
+        if from_memory:
+            self.image = _filename
+        else:
+            self.image = pil.open(_filename)
 
     #armazena o caminho + nome da imagem
     def setFilename(self, _filename):
@@ -29,3 +34,6 @@ class image:
         
         #converte a imagem para o mobo binarios
         return _image.convert('1')
+
+    def segmentation(self, image):
+        pass
