@@ -3,6 +3,10 @@ import image as img
 import PIL as pil
 
 def main():
+    """
+        As funções possuem descrição, então basta colocar o mouse em cima de cada, que vai ser que nem se fosse função de biblioteca
+        Executa todo o programa, se quiser deixar constante a execução vc pode passar via prametro na main
+    """
     print('Por favor informe o caminho das imagens a serem extraidas as caracteristicas: ')
     path = input()
 
@@ -16,6 +20,7 @@ def main():
 
     images = [img.image(path + '\\' + filename) for filename in image_files]
 
-    images[0].getImage().show()
+    t = images[0].segmentation(images[0].getImage())
+
 
 main()
