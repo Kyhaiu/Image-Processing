@@ -3,14 +3,14 @@ import functools
 from PIL import Image as pil
 
 neighbors = {
-            "n_0": [ 0,-1],
-            "n_1": [-1,-1],
-            "n_2": [-1, 0],
-            "n_3": [-1, 1],
-            "n_4": [ 0, 1],
-            "n_5": [ 1, 1],
-            "n_6": [ 1, 0],
-            "n_7": [ 1,-1]
+    "n_0": [ 0,-1],
+    "n_1": [-1,-1],
+    "n_2": [-1, 0],
+    "n_3": [-1, 1],
+    "n_4": [ 0, 1],
+    "n_5": [ 1, 1],
+    "n_6": [ 1, 0],
+    "n_7": [ 1,-1]
 }
 
 class image:
@@ -19,7 +19,7 @@ class image:
             Constutor da classe image
             -------------------------
 
-            Parametros:
+            Parâmetros:
                 _filename: 
                     caminho + nome do arquivo
             
@@ -34,7 +34,7 @@ class image:
         Método que retorna o objeto Image (PIL)
         ---------------------------------------
 
-        Parametros:
+        Parâmetros:
             None
 
         Retorno:
@@ -47,7 +47,7 @@ class image:
         Método que retorna o diretório + nome do arquivo
         ------------------------------------------------
 
-        Parametros:
+        Parâmetros:
             None
 
         Retorno:
@@ -61,7 +61,7 @@ class image:
         Método que realiza instanciação da imagem em memoria
         ---------------------------------------
 
-        Parametros:
+        Parâmetros:
             _filename :  
                 Diretório + Nome do arquivo
 
@@ -84,7 +84,7 @@ class image:
         Método que atribui o Caminho + Nome do Arquivo
         ------------------------------------------------
 
-        Parametros:
+        Parâmetros:
             _filename: Caminho + Nome do Arquivo
 
         Retorno:
@@ -97,7 +97,7 @@ class image:
         Função que procura o pixel não branco mais proximo.
         ------------------------------------------------
 
-        Parametros:\n
+        Parâmetros:\n
             \timage:
                 \tmatrix (np.asarray) da imagem.
             \tx:
@@ -121,10 +121,12 @@ class image:
             i += 1
         return None
 
-    def eight_neighborhood(self, image, x, y):
+    def eight_neighborhood(self, image, x, y, prev):
+        prev = None
         for i in neighbors:
             if not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, image[x + (neighbors[i])[0]][y + (neighbors[i])[1]], [255, 255, 255]), True)):
-                return (x+(neighbors[i])[0], y+(neighbors[i])[1])
+                return (x+(neighbors[i])[0], y+(neighbors[i])[1], prev)
+            prev = neighbors[i]
 
         
 
@@ -132,14 +134,14 @@ class image:
 
     def segmentation(self, image):
         """
-            Parametros:
+            Parâmetros:
                 image: Objeto da classe Image(PIL)
             
             Retorno:
                 função não retorna nada, irá realizar a segmentação da imagem e salvar as imagens individuais
                 na pasta ./imagens/Saida com o nome 
 
-            Algoritimo seguidor de fronteira(Representação e Fronteira Slide 4)
+            Algoritmo seguidor de fronteira(Representação e Fronteira Slide 4)
 
             1)  b0 é o ponto de borda(1) de partida(mais alto à esquerda) c0 (0) é o vizinho a oeste de b0.
                 Examina a vizinhança-8 de b0 a partir de c0 no sentido horário. b1 é o primeiro vizinho encontrado
@@ -155,20 +157,28 @@ class image:
                 A sequência de pontos b encontrados quando encerrado o algorimo constituem o conjunto de ponto de fronteira ordenados.
         """
         img_arr = np.asarray(image.copy())
-        b= []
+        b = []
+        c = [0, 0]
+        b_aux = [None, None]
+        first = True
+        i = 0
+        prev = 0
+
+        # Primeiro b (b0)
         b.append(self.find_next_non_white_pixel(img_arr, 0, 0))
         print(b)
 
-        b_aux= (None, None)
-        b_aux= self.eight_neighborhood(img_arr, b[-1][0], b[-1][1])
-        b.append(b_aux)
-        
-        while b[-1] != b[0]:
-            b_aux= self.eight_neighborhood(img_arr, b[-1][0], b[-1][1])
-            #adicionei essa linha
-            img_arr[b[-1][0]][b[-1][1]] = [255, 255, 255]
+        while (b[-1] != b[0] or first):
+            if(first):
+                b_aux[0], b_aux[1], c = self.eight_neighborhood(img_arr, b[-1][0], b[-1][1], c)
+                first = False
+            else:
+                b_aux[0], b_aux[1], c = self.eight_neighborhood(img_arr, b[-1][0] + c[0], b[-1][1] + c[1], c)
+  
             b.append(b_aux)
-        
-        print(b)
 
-        
+            #print(c)
+            print(b_aux)
+            print(c)
+            
+            i += 1

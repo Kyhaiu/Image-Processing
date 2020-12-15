@@ -8,7 +8,7 @@ def main():
         Executa todo o programa, se quiser deixar constante a execução vc pode passar via prametro na main
     """
     print('Por favor informe o caminho das imagens a serem extraidas as caracteristicas: ')
-    path = input()
+    path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
 
     image_files = []
 
