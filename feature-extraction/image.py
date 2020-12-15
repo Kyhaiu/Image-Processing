@@ -1,10 +1,19 @@
 import numpy as np
-
+import functools
 from PIL import Image as pil
 
+neighbors = {
+            "n_0": [ 0,-1],
+            "n_1": [-1,-1],
+            "n_2": [-1, 0],
+            "n_3": [-1, 1],
+            "n_4": [ 0, 1],
+            "n_5": [ 1, 1],
+            "n_6": [ 1, 0],
+            "n_7": [ 1,-1]
+}
 
 class image:
-    #Construtor da classe
     def __init__(self, _filename):
         """
             Constutor da classe image
@@ -110,6 +119,16 @@ class image:
                     return (i, j)
                 j += 1
             i += 1
+        return None
+
+    def eight_neighborhood(self, image, x, y):
+        for i in neighbors:
+            if not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, image[x + (neighbors[i])[0]][y + (neighbors[i])[1]], [255, 255, 255]), True)):
+                return (x+(neighbors[i])[0], y+(neighbors[i])[1])
+
+        
+
+            
 
     def segmentation(self, image):
         """
@@ -135,5 +154,21 @@ class image:
             5)  Repita 3) e 4) até que b = b0 e o próximo ponto de fronteira encontrado seja b1. 
                 A sequência de pontos b encontrados quando encerrado o algorimo constituem o conjunto de ponto de fronteira ordenados.
         """
-        b = self.find_next_non_white_pixel(np.asarray(image), 0, 0 )
+        img_arr = np.asarray(image.copy())
+        b= []
+        b.append(self.find_next_non_white_pixel(img_arr, 0, 0))
         print(b)
+
+        b_aux= (None, None)
+        b_aux= self.eight_neighborhood(img_arr, b[-1][0], b[-1][1])
+        b.append(b_aux)
+        
+        while b[-1] != b[0]:
+            b_aux= self.eight_neighborhood(img_arr, b[-1][0], b[-1][1])
+            #adicionei essa linha
+            img_arr[b[-1][0]][b[-1][1]] = [255, 255, 255]
+            b.append(b_aux)
+        
+        print(b)
+
+        
