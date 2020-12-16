@@ -2,15 +2,26 @@ import numpy as np
 import functools
 from PIL import Image as pil
 
-neighbors = {
-            "n_0": [ 0,-1],
-            "n_1": [-1,-1],
-            "n_2": [-1, 0],
-            "n_3": [-1, 1],
-            "n_4": [ 0, 1],
-            "n_5": [ 1, 1],
-            "n_6": [ 1, 0],
-            "n_7": [ 1,-1]
+neighbors ={
+    "n_0": [ 0, -1],
+    "n_1": [-1, -1],
+    "n_2": [-1,  0],
+    "n_3": [-1,  1],
+    "n_4": [ 0,  1],
+    "n_5": [ 1,  1],
+    "n_6": [ 1,  0],
+    "n_7": [ 1, -1]
+}
+
+inverse_neighbors ={
+    "[0, -1]" : 0,
+    "[-1, -1]": 1,
+    "[-1, 0]" : 2,
+    "[-1, 1]" : 3,
+    "[0, 1]"  : 4,
+    "[1, 1]"  : 5,
+    "[1, 0]"  : 6,
+    "[1, -1]" : 7
 }
 
 class image:
@@ -91,13 +102,13 @@ class image:
             None
         """
         self.filename = _filename
-    
+
     def find_next_non_white_pixel(self, image, x, y):
         """
         Função que procura o pixel não branco mais proximo.
         ------------------------------------------------
 
-        Parametros:\n
+        Parâmetros:\n
             \timage:
                 \tmatrix (np.asarray) da imagem.
             \tx:
@@ -115,60 +126,65 @@ class image:
         while i < image.shape[0]:
             j = 0
             while j < image.shape[1]:
-                if image[i][j][0] != 255 or image[i][j][1] != 255 or image[i][j][2] != 255:
+                if image[i][j][0] != 240 or image[i][j][1] != 240 or image[i][j][2] != 240:
+                #if int(image[x][y]) != 240:
                     return (i, j)
                 j += 1
             i += 1
-        return None
 
-    def eight_neighborhood(self, image, x, y):
+    def find_neigh(self, b, c):
+        k = [c[0] - b[0], c[1] - b[1]]
+        return inverse_neighbors[str(k)]
+
+    def eight_neighborhood(self, image, b, c):
+        previous_neigh = None
+        flag = False
         for i in neighbors:
-            if not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, image[x + (neighbors[i])[0]][y + (neighbors[i])[1]], [255, 255, 255]), True)):
-                return (x+(neighbors[i])[0], y+(neighbors[i])[1])
+            if i == 'n_'+str(self.find_neigh(b, c)) or flag:
+                flag = True
+                x = b[0] + neighbors[i][0]
+                y = b[1] + neighbors[i][1]
+                if image[x][y][0] != 240 or image[x][y][1] != 240 or image[x][y][2] != 240:
+                #if int(image[x][y]) != 240:
+                    c[0] = b[0] + previous_neigh[0]
+                    c[1] = b[1] + previous_neigh[1]
+                    return ([x, y], c)
+            previous_neigh = neighbors[i]
 
+
+        for i in neighbors:
+            if i == 'n_'+str(self.find_neigh(b, c)) or flag:
+                x = b[0] + neighbors[i][0]
+                y = b[1] + neighbors[i][1]
+                if image[x][y][0] != 240 or image[x][y][1] != 240 or image[x][y][2] != 240:
+                #if int(image[x][y]) != 240:
+                    c[0] = b[0] + previous_neigh[0]
+                    c[1] = b[1] + previous_neigh[1]
+                    return ([x, y], c)
+            previous_neigh = neighbors[i]
+
+    #passos 3 a 5 algoritimo
+    def explore_frontier(self, image, b, c, end):
+        border = []
+        border.append(b)
         
+        while not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, border[-1], end), True)):
+            b, c = self.eight_neighborhood(image, border[-1], c)
+            border.append(b)
 
-            
+        return border
 
+
+    #passos 1 e 2 do algoritimo
     def segmentation(self, image):
-        """
-            Parametros:
-                image: Objeto da classe Image(PIL)
-            
-            Retorno:
-                função não retorna nada, irá realizar a segmentação da imagem e salvar as imagens individuais
-                na pasta ./imagens/Saida com o nome 
+        arr_img = np.asarray(image)
+        b0 = self.find_next_non_white_pixel(arr_img, 0, 0)
+        c0 = [b0[0]-1, b0[1]]
 
-            Algoritimo seguidor de fronteira(Representação e Fronteira Slide 4)
+        b, c = self.eight_neighborhood(arr_img, b0, c0)
 
-            1)  b0 é o ponto de borda(1) de partida(mais alto à esquerda) c0 (0) é o vizinho a oeste de b0.
-                Examina a vizinhança-8 de b0 a partir de c0 no sentido horário. b1 é o primeiro vizinho encontrado
-                com valor 1 e c1(0) é o vizinho anterior. Guarde a localização de b0 e b1 para a etapa 5;
-
-            2)  Considere b = b1 e c = c1;
-
-            3)  Faça com que os vizinhos-8 de b, a partir de c em sentido horarío, sejam indicados por n1, n2, ..., n8. Encontro o primeiro nk de borda(1)
-
-            4)  Considere b = nk e c = nk-1
-
-            5)  Repita 3) e 4) até que b = b0 e o próximo ponto de fronteira encontrado seja b1. 
-                A sequência de pontos b encontrados quando encerrado o algorimo constituem o conjunto de ponto de fronteira ordenados.
-        """
-        img_arr = np.asarray(image.copy())
-        b= []
-        b.append(self.find_next_non_white_pixel(img_arr, 0, 0))
-        print(b)
-
-        b_aux= (None, None)
-        b_aux= self.eight_neighborhood(img_arr, b[-1][0], b[-1][1])
-        b.append(b_aux)
-        
-        while b[-1] != b[0]:
-            b_aux= self.eight_neighborhood(img_arr, b[-1][0], b[-1][1])
-            #adicionei essa linha
-            img_arr[b[-1][0]][b[-1][1]] = [255, 255, 255]
-            b.append(b_aux)
-        
-        print(b)
+        border = self.explore_frontier(arr_img, b, c, b0)
+        border.insert(0, b0)
+        return border
 
         
