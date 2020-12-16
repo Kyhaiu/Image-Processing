@@ -1,6 +1,7 @@
 import numpy as np
+import cv2 as cv
+from matplotlib import pyplot as plt
 import functools
-from PIL import Image as pil
 
 neighbors ={
     "n_0": [ 0, -1],
@@ -88,7 +89,10 @@ class image:
         if memory:
             self.image = _filename
         else:
-            self.image = pil.open(_filename)
+            self.image = cv.imread(_filename)
+            self.image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
+            ret, self.image = cv.threshold(self.image, 127, 255, cv.THRESH_BINARY)
+            
 
     def setFilename(self, _filename):
         """
@@ -122,12 +126,11 @@ class image:
         """
         i = x
         j = y
-
         while i < image.shape[0]:
             j = 0
             while j < image.shape[1]:
-                if image[i][j][0] != 240 or image[i][j][1] != 240 or image[i][j][2] != 240:
-                #if int(image[x][y]) != 240:
+                if image[i][j] != 255:
+                #if image[i][j][0] != 255 or image[i][j][1] != 255 or image[i][j][2] != 255:
                     return (i, j)
                 j += 1
             i += 1
@@ -144,8 +147,8 @@ class image:
                 flag = True
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
-                if image[x][y][0] != 240 or image[x][y][1] != 240 or image[x][y][2] != 240:
-                #if int(image[x][y]) != 240:
+                if image[x][y] != 255:
+                #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
@@ -156,8 +159,8 @@ class image:
             if i == 'n_'+str(self.find_neigh(b, c)) or flag:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
-                if image[x][y][0] != 240 or image[x][y][1] != 240 or image[x][y][2] != 240:
-                #if int(image[x][y]) != 240:
+                if image[x][y] != 255:
+                #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
@@ -171,19 +174,21 @@ class image:
         while not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, border[-1], end), True)):
             b, c = self.eight_neighborhood(image, border[-1], c)
             border.append(b)
+            print(f"Cor do pixel {border[-1]} = {image[border[-1][0]][border[-1][1]]}")
 
         return border
 
 
     #passos 1 e 2 do algoritimo
     def segmentation(self, image):
-        arr_img = np.asarray(image)
-        b0 = self.find_next_non_white_pixel(arr_img, 0, 0)
+        plt.imshow(self.image)
+        plt.show()
+        b0 = self.find_next_non_white_pixel(image, 0, 0)
         c0 = [b0[0]-1, b0[1]]
 
-        b, c = self.eight_neighborhood(arr_img, b0, c0)
+        b, c = self.eight_neighborhood(image, b0, c0)
 
-        border = self.explore_frontier(arr_img, b, c, b0)
+        border = self.explore_frontier(image, b, c, b0)
         border.insert(0, b0)
         return border
 

@@ -1,6 +1,6 @@
 import os
 import image as img
-import PIL as pil
+
 
 def main():
     """
@@ -8,7 +8,7 @@ def main():
         Executa todo o programa, se quiser deixar constante a execução vc pode passar via prametro na main
     """
     print('Por favor informe o caminho das imagens a serem extraidas as caracteristicas: ')
-    path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
+    path = input()
 
     image_files = []
 
@@ -16,7 +16,6 @@ def main():
         if os.path.isfile(path + '\\' + name):
             image_files.append(name)
     
-    #im = pil.Image.open(path + '\\' + image_files[0])
     """
             |  0   1   2   3   4   5   6
             ------------------------------
@@ -27,7 +26,7 @@ def main():
             4|      1           1
             5|      1   1   1   1
             6|  
-        """
+       
     im = [
                 [[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]],
                 [[255, 255, 255], [255, 255, 255], [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [255, 255, 255]],
@@ -37,11 +36,12 @@ def main():
                 [[255, 255, 255], [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [255, 255, 255], [255, 255, 255]],
                 [[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]
                 ]
+    """
     
 
     images = [img.image(path + '\\' + filename) for filename in image_files]
     
-    t = images[0].segmentation(im)
+    t = images[0].segmentation(images[0].getImage())
     print(t)
 
 
