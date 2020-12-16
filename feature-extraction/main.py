@@ -42,7 +42,7 @@ def main():
     images = [img.image(path + '\\' + filename) for filename in image_files]
     
     t = images[0].segmentation(images[0].getImage())
-    print(t)
+    #print(t)
 
 
 main()
