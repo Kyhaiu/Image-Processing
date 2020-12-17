@@ -200,8 +200,9 @@ class image:
 
         plt.plot(y, x)
         plt.show()
-        #Código abaixo tenta salvar uma img nova, mas não está funcioando
         """
+        #Código abaixo tenta salvar uma img nova, mas não está funcioando
+        
         frontier_matrix = np.array(frontier)
 
         # define dimensões da sub-imagem
@@ -254,7 +255,9 @@ class image:
         perimeter = len(frontier)
 
         cv.imwrite('Entradas/teste.png', new_img)
+
         """
+
         return frontier
 
         
