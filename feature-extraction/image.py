@@ -1,3 +1,6 @@
+# https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
+
+import os
 import numpy as np
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -5,27 +8,28 @@ import functools
 import copy
 from scipy import ndimage
 
-neighbors ={
-    "n_0": [ 0, -1],
+neighbors = {
+    "n_0": [0, -1],
     "n_1": [-1, -1],
     "n_2": [-1,  0],
     "n_3": [-1,  1],
-    "n_4": [ 0,  1],
-    "n_5": [ 1,  1],
-    "n_6": [ 1,  0],
-    "n_7": [ 1, -1]
+    "n_4": [0,  1],
+    "n_5": [1,  1],
+    "n_6": [1,  0],
+    "n_7": [1, -1]
 }
 
-inverse_neighbors ={
-    "[0, -1]" : 0,
+inverse_neighbors = {
+    "[0, -1]": 0,
     "[-1, -1]": 1,
-    "[-1, 0]" : 2,
-    "[-1, 1]" : 3,
-    "[0, 1]"  : 4,
-    "[1, 1]"  : 5,
-    "[1, 0]"  : 6,
-    "[1, -1]" : 7
+    "[-1, 0]": 2,
+    "[-1, 1]": 3,
+    "[0, 1]": 4,
+    "[1, 1]": 5,
+    "[1, 0]": 6,
+    "[1, -1]": 7
 }
+
 
 class image:
     def __init__(self, _filename):
@@ -36,7 +40,7 @@ class image:
             Parametros:
                 _filename: 
                     caminho + nome do arquivo
-            
+
             Retorno:
                 None
         """
@@ -55,7 +59,7 @@ class image:
             Image object from PIL
         """
         return self.image
-    
+
     def getFilename(self):
         """
         Método que retorna o diretório + nome do arquivo
@@ -69,7 +73,7 @@ class image:
         """
         return self.filename
 
-    #cria uma instancia virtual da imagem(copia ela pra memoria)
+    # cria uma instancia virtual da imagem(copia ela pra memoria)
     def setImage(self, _filename, memory=False):
         """
         Método que realiza instanciação da imagem em memoria
@@ -79,7 +83,7 @@ class image:
             _filename :  
                 Diretório + Nome do arquivo
 
-            
+
             memory (padrão=False) : 
                 parametro que determina se irá abrir  
                 diretamente da memoria, ou se apenas irá realizar a atribuição do  
@@ -93,8 +97,8 @@ class image:
         else:
             self.image = cv.imread(_filename)
             self.image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
-            ret, self.image = cv.threshold(self.image, 240, 255, cv.THRESH_BINARY)
-            
+            ret, self.image = cv.threshold(
+                self.image, 240, 255, cv.THRESH_BINARY)
 
     def setFilename(self, _filename):
         """
@@ -132,7 +136,7 @@ class image:
             j = 0
             while j < image.shape[1]:
                 if image[i][j] != 255:
-                #if image[i][j][0] != 255 or image[i][j][1] != 255 or image[i][j][2] != 255:
+                    # if image[i][j][0] != 255 or image[i][j][1] != 255 or image[i][j][2] != 255:
                     return (i, j)
                 j += 1
             i += 1
@@ -150,45 +154,43 @@ class image:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
                 if image[x][y] != 255:
-                #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
+                    # if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
             previous_neigh = neighbors[i]
-
 
         for i in neighbors:
             if i == 'n_'+str(self.find_neigh(b, c)) or flag:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
                 if image[x][y] != 255:
-                #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
+                    # if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
             previous_neigh = neighbors[i]
 
-    #passos 3 a 5 algoritimo
+    # passos 3 a 5 algoritimo
     def explore_frontier(self, image, b, c, end):
         border = []
         border.append(b)
-        
-        while not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, border[-1], end), True)):
+
+        while not(functools.reduce(lambda i, j: i and j, map(lambda p, q: p == q, border[-1], end), True)):
             b, c = self.eight_neighborhood(image, border[-1], c)
             border.append(b)
 
         return border
 
+    # passos 1 e 2 do algoritimo
 
-    #passos 1 e 2 do algoritimo
     def segmentation(self, image):
         plt.imshow(self.image)
-        #plt.show()
+        # plt.show()
         b0 = self.find_next_non_white_pixel(image, 0, 0)
         c0 = [b0[0]-1, b0[1]]
 
         b, c = self.eight_neighborhood(image, b0, c0)
-
 
         frontier = self.explore_frontier(image, b, c, b0)
         frontier.insert(0, b0)
@@ -260,4 +262,16 @@ class image:
 
         return frontier
 
-        
+    def grayscale(self, image):
+        image = cv.imread(
+            "C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Entradas\\Teste01.png")
+        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+        # Change the current directory to specified directory
+        os.chdir("C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Grayscale")
+        cv.imwrite("Teste01Gray.png", gray)
+
+        #cv.imshow('Original Image', image)
+        #cv.imshow('Gray Image', gray)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
