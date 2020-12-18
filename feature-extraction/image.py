@@ -276,7 +276,7 @@ class image:
         # cv.waitKey(0)
         # cv.destroyAllWindows()
 
-    def greycomatrix(self, image, distances, angles, levels=None, symmetric=False):
+    def glmc(self, image, distances, angles, levels=None, symmetric=False):
         image = np.ascontiguousarray(image)
 
         image_max = image.max()         # Maior tom de cor que existe na imagem
@@ -303,6 +303,8 @@ class image:
         if symmetric:
             Pt = np.transpose(P, (1, 0, 2, 3))
             P = P + Pt
+
+        # correlação, contraste, uniformidade
 
         return P
 
@@ -331,14 +333,3 @@ class image:
                         out[i, j, d, a] += 1
 
         # https://www.mathworks.com/help/images/ref/referenceetoh36.gif
-        
-        # Angles:
-        #   0 => [ 0, D]
-        #  45 => [-D, D]
-        #  90 => [-D, 0]
-        # 135 => [-D,-D]
-
-        #if(angle == 0):
-        #elif(angle == 45):
-        #elif(angle == 90):
-        #else:

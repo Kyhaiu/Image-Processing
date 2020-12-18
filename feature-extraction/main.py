@@ -63,7 +63,7 @@ def main():
     #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
     # ]
 
-    result = images[0].greycomatrix(im, 1, 0, levels=8)
+    result = images[0].glmc(im, 1, 0, levels=8)
     print(result)
 
 
