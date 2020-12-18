@@ -370,9 +370,23 @@ class image:
         pass
 
     def generate_csv_and_save(self, image):
+        """
+        No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
+        gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
+            - ID  Imagem(mesmo  nome  do  arquivo  de  entrada);
+            - ID  Folha(Inteiro sequencial, reiniciado para cada nova imagem de entrada);
+            - Propriedade 1, Propriedade 2, ..., Propriedade N.
+        
+        O perímetro também é propriedade a ser armazenada  no  arquivo  .csv,  bem
+        como as propriedades especificadas para cada uma das equipes, de acordo com
+        a lista abaixo.
+
+        Os campos devem, necessariamente serem separados por vírgula.
+        Valores fracionários devem usar o “.” como separador decimal.
+        """
         img_array = (image.flatten())
         img_array = img_array.reshape(-1, 1).T
-
         #print(img_array)
+
         with open('output.csv', 'ab') as f:
             np.savetxt(f, img_array, delimiter=",")
