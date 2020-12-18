@@ -138,10 +138,41 @@ class image:
             i += 1
 
     def find_neigh(self, b, c):
+        """
+        Função que calcula a qual é a posição de C em relação a B(n_0, n_1, ..., n_7)
+        -----------------------------------------------------------------------------
+
+        Parâmetros:\n
+            \tb:
+                \tindice (x, y) do pixel B atual
+            \tc:
+                \tindice (x, y) do pixel C atual.
+
+        Retorno:\n
+            \tretorna um numero que corresponde a posição de C em relação a B.
+        """
         k = [c[0] - b[0], c[1] - b[1]]
         return inverse_neighbors[str(k)]
 
     def eight_neighborhood(self, image, b, c):
+        """
+        Função que faz C rodar em volta de B, e retorna o 1º pixel diferente de branco.
+        ------------------------------------------------------------------------------
+
+        Parâmetros:\n
+            \timage:
+                \tmatriz que representa a imagem de interece\n
+                \tObs.: A matriz está binarizada, ou seja, só possui duas cores(preto e branco).
+            \tb:
+                \tindice (x, y) que representa um pixel de borda a borda na imagem a ser segmentada.
+            \tc:
+                \tindice (x, y) que repsenta o pixel que irá girar em torno do pixel B percorrendo um caminho\n
+                \tde 8-Vizinhança até achar um ponto diferente de branco. 
+
+        Retorno:\n
+            \tRetorna o indice do novo pixel B que está na 8-vizinhança do pixel B anterior.\n
+            \tE o indice do novo pixel C, que é o vizinho anterior ao B (n_0, n_1, ..., n_7). 
+        """
         previous_neigh = None
         flag = False
         for i in neighbors:
@@ -170,6 +201,24 @@ class image:
 
     #passos 3 a 5 algoritimo
     def explore_frontier(self, image, b, c, end):
+        """
+        Função que explora a borda de um elemento encontrado
+        -----------------------------------------------------------------------------
+
+        Parâmetros:\n
+            \timage:
+                \tmatriz que representa a imagem de interese.
+                \tObs.: a matriz necessita ser binária, ou seja possuir só dois valores, e o objeto de interesse precisa ser preto.
+            \tb:
+                \tindice (x, y) do pixel B após o b0(inicio da borda)
+            \tc:
+                \tindice (x, y) do pixel C referente a B.
+            \tend:
+                \tindice do pixel b0, ou seja, primeiro pixel de borda.
+
+        Retorno:\n
+            \tretorna uma lista que contem todos os indices de elementos de fronteira da imagem.
+        """
         border = []
         border.append(b)
         
@@ -182,6 +231,17 @@ class image:
 
     #passos 1 e 2 do algoritimo
     def segmentation(self, image):
+        """
+        Função que realiza o processo de segmentação da imagem completa. E grava em disco as imagens segmentadas de borda e da folha completa
+        -------------------------------------------------------------------------------------------------------------------------------------
+
+        Parâmetros:\n
+            \timage:
+                \trecebe uma imagem em memoria(atributo self.image da classe image.py)
+
+        Retorno:\n
+            \tnão possui retorno(PODE MUDAR)
+        """
         plt.imshow(self.image)
         #plt.show()
         b0 = self.find_next_non_white_pixel(image, 0, 0)
