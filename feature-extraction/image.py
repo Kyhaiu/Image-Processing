@@ -1,4 +1,7 @@
-# https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
+# Materiais:
+#   https://prism.ucalgary.ca/bitstream/handle/1880/51900/texture%20tutorial%20v%203_0%20180206.pdf
+#   https://www.mathworks.com/help/images/ref/graycomatrix.html
+#   https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
 
 import os
 import numpy as np
@@ -330,12 +333,37 @@ class image:
                     if 0 <= i < levels and 0 <= j < levels:
                         out[i, j, d, a] += 1
 
-        # https://www.mathworks.com/help/images/ref/referenceetoh36.gif
 
+    """ 
+        Contraste (isso também é chamado de "variação da soma dos quadrados"
+        e, ocasionalmente, "inércia" (inertia)):
+            Quando i e j são iguais, a célula está na diagonal e (i-j) = 0.
+            Esses valores representam pixels inteiramente semelhantes ao seu
+            vizinho, então eles recebem um peso de 0 (sem contraste). Se i e
+            j diferem por 1, há um pequeno contraste, e o peso é 1. Se i e j
+            diferem por 2 , o contraste está aumentando e o peso é 4. Os pesos
+            continuam a aumentar exponencialmente à medida que (ij) aumenta.
 
-    # Correlação, contraste e uniformidade
+        Uniformidade:
+            Dissimilaridade e contraste resultam em números maiores para mais
+            janelas mostrando mais contraste. Se os pesos diminuirem na diagonal,
+            a medida de textura calculada será maior para janelas com pouco contraste.
+            A homogeneidade pondera os valores pelo inverso do peso do contraste, com
+            os pesos diminuindo exponencialmente em relação à diagonal.
+
+        Correlação:
+            A textura de correlação mede a dependência linear dos níveis de cinza
+            daqueles dos pixels vizinhos.
+            O que significa correlação? Correlação entre pixels significa que há
+            uma relação previsível e linear entre os dois pixels vizinhos dentro
+            da janela, expressa pela equação de regressão. Exemplo: suponha que
+            haja uma correlação muito alta entre o pixel de referência e vizinho,
+            expressa por n = 2r + 2 , onde n é o valor do vizinho e r da referência.
+            Portanto, se r = 1, é muito provável que n seja igual a 4; se r = 4,
+            n = 10, etc.
+            Uma textura de alta correlação significa alta previsibilidade das
+            relações de pixel.
+    """
     def glcmprops(self, greylevel, prop='contrast'):
-        # 'contrast': sum_{i,j=0}^{levels-1} P_{i,j}(i-j)^2`
-        # 'homogeneity': sum_{i,j=0}^{levels-1}frac{P_{i,j}}{1+(i-j)^2}`
-        # 'correlation': sum_{i,j=0}^{levels-1} P_{i,j}left[frac{(i-mu_i)(j-mu_j)}{sqrt{(sigma_i^2)(sigma_j^2)}}right]
+        
         pass
