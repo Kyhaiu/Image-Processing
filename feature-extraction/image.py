@@ -92,17 +92,11 @@ class image:
             self.image = _filename
         else:
             self.image = cv.imread(_filename)
-<<<<<<< Updated upstream
-            self.image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
-            ret, self.image = cv.threshold(self.image, 240, 255, cv.THRESH_BINARY)
-            
-=======
             aux = self.image.copy()
             aux = cv.cvtColor(aux, cv.COLOR_BGR2GRAY)
             ret, self.binaryImage = cv.threshold(aux, 240, 255, cv.THRESH_BINARY)
             del aux, ret
 
->>>>>>> Stashed changes
 
     def setFilename(self, _filename):
         """
@@ -266,71 +260,7 @@ class image:
             x.append(i[0])
             y.append(i[1])
 
-        plt.plot(y, x)
-<<<<<<< Updated upstream
-        plt.show()
-        """
-        #Código abaixo tenta salvar uma img nova, mas não está funcioando
-        
-        frontier_matrix = np.array(frontier)
-
-        # define dimensões da sub-imagem
-        min_y = np.min(frontier_matrix[:,0])
-        max_y = np.max(frontier_matrix[:,0])
-        min_x = np.min(frontier_matrix[:,1])
-        max_x = np.max(frontier_matrix[:,1])
-        frontier_height = max_y - min_y
-        frontier_width  = max_x - min_x
-
-        # padding de 1 ao redor da fronteira
-        new_height = frontier_height+1
-        new_width = frontier_width+1
-        border_img = np.zeros((new_height, new_width))
-
-        # reposiciona as coordernadas de frontier_matrix para o canto superior esquerdo
-        frontier_matrix = frontier_matrix - [min_y, min_x]
-
-        # transfere a fronteira para "border_img"
-        for f in frontier_matrix:
-            border_img[f[0], f[1]] = 1
-        
-        # cria máscar "mask" que será utilizada para extrair a sub-imagem da imagem original
-        mask = copy.deepcopy(border_img)
-        mask = ndimage.binary_fill_holes(mask).astype(int)
-
-        # adiciona 3ª dimensão em mask3D para que o broadcast seja possível
-        mask3D = np.zeros((new_height, new_width, 1))
-        # pega os valores de mask
-        mask3D[:,:,0] = mask
-        # converte mask3D em uma matriz booleana
-        mask3D = np.array(mask3D, dtype=bool)
-        
-        # aplica máscara "mask" sobre a imagem original, extraindo a subimagem "new_img"
-        new_img = np.zeros((new_height, new_width,3))
-        new_img = np.multiply(image[min_y:max_y+1, min_x:max_x+1], mask3D)
-        img[min_y:max_y+1, min_x:max_x+1,:] = np.multiply(image[min_y:max_y+1, min_x:max_x+1], np.logical_not(mask3D))
-
-        # troca fundos pretos da aplicação da máscara por fundos brancos
-        new_img = np.where(mask3D==[0],[255,255,255], new_img)
-        img_part = np.where(mask3D==[0], image[min_y:max_y+1, min_x:max_x+1], [255,255,255])
-        img[min_y:max_y+1, min_x:max_x+1] = img_part
-              
-        # transforma imagem de borda em imagem RGB
-        # determina os valores de "border_rgb", trocando fundo preto da imagem de borda por fundo branco e deixa o contorno preto
-        border_test = np.where(border_img==0, 255, 0)
-        border_rgb = np.stack((border_test, border_test, border_test),axis=-1)
-
-        # pega o perimetro da sub-imagem
-        perimeter = len(frontier)
-
-        cv.imwrite('Entradas/teste.png', new_img)
-
-        """
-
-        return frontier
-
-=======
-      
+        plt.plot(y, x) 
         self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y))
 
         width = max(x) - min(x)
@@ -384,5 +314,4 @@ class image:
         #cv.imshow("folhinha", cropedImage)
         cv.imwrite("teste.png", cropedImage)
         #cv.waitKey(0)
->>>>>>> Stashed changes
         
