@@ -64,7 +64,7 @@ def main():
     # ]
 
     result = images[0].glmc(im, 1, 0, levels=8)
-    print(result)
+    #print(result)
 
     contraste = images[0].glcmprops(result, 'contrast')
     uniformidade = images[0].glcmprops(result, 'homogeneity')

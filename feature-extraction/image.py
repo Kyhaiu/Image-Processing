@@ -1,6 +1,7 @@
 # Materiais:
 #   https://prism.ucalgary.ca/bitstream/handle/1880/51900/texture%20tutorial%20v%203_0%20180206.pdf
 #   https://www.mathworks.com/help/images/ref/graycomatrix.html
+#   https://www.youtube.com/watch?v=iVFFfLDU-rA
 #   https://github.com/Kunena/Kunena-Forum/wiki/Create-a-new-branch-with-git-and-manage-branches
 
 import os
