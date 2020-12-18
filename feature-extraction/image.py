@@ -92,9 +92,17 @@ class image:
             self.image = _filename
         else:
             self.image = cv.imread(_filename)
+<<<<<<< Updated upstream
             self.image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
             ret, self.image = cv.threshold(self.image, 240, 255, cv.THRESH_BINARY)
             
+=======
+            aux = self.image.copy()
+            aux = cv.cvtColor(aux, cv.COLOR_BGR2GRAY)
+            ret, self.binaryImage = cv.threshold(aux, 240, 255, cv.THRESH_BINARY)
+            del aux, ret
+
+>>>>>>> Stashed changes
 
     def setFilename(self, _filename):
         """
@@ -259,6 +267,7 @@ class image:
             y.append(i[1])
 
         plt.plot(y, x)
+<<<<<<< Updated upstream
         plt.show()
         """
         #Código abaixo tenta salvar uma img nova, mas não está funcioando
@@ -320,4 +329,60 @@ class image:
 
         return frontier
 
+=======
+      
+        self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y))
+
+        width = max(x) - min(x)
+        height = max(y) - min(y)
+        
+        self.createNewImage(width, height, frontier, max(x), max(y))
+
+
+        #print(frontier)
+
+        return frontier
+
+    def createNewImage(self, width, height, frontier, xMax, yMax):
+        newImage = np.zeros((height, width))
+        
+        print(newImage.shape)
+        print(height, width)
+        i = 0
+        j = 0
+
+        while (i < newImage.shape[0]):
+            j = 0
+            while (j < newImage.shape[1]):
+                newImage[i][j] = 255
+                j = j + 1
+            i = i + 1
+
+        i = 0
+        while (i < len(frontier)):
+            newImage[yMax-frontier[i][1]-1][xMax-frontier[i][0]-1] = 0
+            i+=1
+        
+        fliped = np.fliplr(newImage)
+
+        #(h, w) = fliped.shape[:2]
+        #center = (w / 2, h / 2)
+        # rotate the image by 180 degrees
+        #M = cv.getRotationMatrix2D(center, 90, 1.0)
+        #rotated = cv.warpAffine(fliped, M, (w, h))
+
+        image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
+
+        cv.imshow("folhinha", image)
+        cv.waitKey(0)
+        
+        #print(newImage)
+        return newImage
+
+    def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax):
+        cropedImage = rgbImage[xMin:xMax, yMin:yMax]
+        #cv.imshow("folhinha", cropedImage)
+        cv.imwrite("teste.png", cropedImage)
+        #cv.waitKey(0)
+>>>>>>> Stashed changes
         
