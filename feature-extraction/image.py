@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 import functools
 import copy
 from scipy import ndimage
+from math import cos, sin
 
 neighbors = {
     "n_0": [0, -1],
@@ -29,7 +30,6 @@ inverse_neighbors = {
     "[1, 0]": 6,
     "[1, -1]": 7
 }
-
 
 class image:
     def __init__(self, _filename):
@@ -276,7 +276,69 @@ class image:
         # cv.waitKey(0)
         # cv.destroyAllWindows()
 
-    def matrix(self, image):
-        distance = 1
-        angle = 0
-        shades_gray = 8
+    def greycomatrix(self, image, distances, angles, levels=None, symmetric=False):
+        image = np.ascontiguousarray(image)
+
+        image_max = image.max()         # Maior tom de cor que existe na imagem
+
+        """
+            O argumento de níveis (levels) é necessário para tipos de dados diferentes
+            de uint8. A matriz resultante terá pelo menos níveis 2 de tamanho.
+            
+            O valor máximo da escala de cinza na imagem deve ser menor que o número de níveis (levels).
+        """
+        if levels is None:
+            levels = 256
+
+        distances = np.ascontiguousarray(distances, dtype=np.float64)
+        angles = np.ascontiguousarray(angles, dtype=np.float64)
+
+        P = np.zeros((levels, levels, len(distances), len(angles)),
+                    dtype=np.uint32, order='C')
+
+        # Contagem de co-ocorrências
+        self._glcm_loop(image, distances, angles, levels, P)
+
+        # Faça cada GLMC simétrico
+        if symmetric:
+            Pt = np.transpose(P, (1, 0, 2, 3))
+            P = P + Pt
+
+        return P
+
+    def _glcm_loop(self, image, distances, angle, levels, out):
+        rows = image.shape[0]
+        cols = image.shape[1]
+
+        a = 0
+
+        for d in range(distances.shape[0]):
+            distance = distances[d]
+            offset_row = round(sin(angle) * distance)
+            offset_col = round(cos(angle) * distance)
+            start_row = max(0, -offset_row)
+            end_row = min(rows, rows - offset_row)
+            start_col = max(0, -offset_col)
+            end_col = min(cols, cols - offset_col)
+            for r in range(start_row, end_row):
+                for c in range(start_col, end_col):
+                    i = image[r, c]
+                    # Calcule a localização do pixel de deslocamento
+                    row = r + offset_row
+                    col = c + offset_col
+                    j = image[row, col]
+                    if 0 <= i < levels and 0 <= j < levels:
+                        out[i, j, d, a] += 1
+
+        # https://www.mathworks.com/help/images/ref/referenceetoh36.gif
+        
+        # Angles:
+        #   0 => [ 0, D]
+        #  45 => [-D, D]
+        #  90 => [-D, 0]
+        # 135 => [-D,-D]
+
+        #if(angle == 0):
+        #elif(angle == 45):
+        #elif(angle == 90):
+        #else:
