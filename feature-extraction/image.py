@@ -297,18 +297,16 @@ class image:
                     dtype=np.uint32, order='C')
 
         # Contagem de co-ocorrências
-        self._glcm_loop(image, distances, angles, levels, P)
+        self.glcm_loop(image, distances, angles, levels, P)
 
         # Faça cada GLMC simétrico
         if symmetric:
             Pt = np.transpose(P, (1, 0, 2, 3))
             P = P + Pt
 
-        # correlação, contraste, uniformidade
-
         return P
 
-    def _glcm_loop(self, image, distances, angle, levels, out):
+    def glcm_loop(self, image, distances, angle, levels, out):
         rows = image.shape[0]
         cols = image.shape[1]
 
@@ -325,7 +323,7 @@ class image:
             for r in range(start_row, end_row):
                 for c in range(start_col, end_col):
                     i = image[r, c]
-                    # Calcule a localização do pixel de deslocamento
+                    # Calcula a localização do pixel de deslocamento
                     row = r + offset_row
                     col = c + offset_col
                     j = image[row, col]
@@ -333,3 +331,11 @@ class image:
                         out[i, j, d, a] += 1
 
         # https://www.mathworks.com/help/images/ref/referenceetoh36.gif
+
+
+    # Correlação, contraste e uniformidade
+    def glcmprops(self, greylevel, prop='contrast'):
+        # 'contrast': sum_{i,j=0}^{levels-1} P_{i,j}(i-j)^2`
+        # 'homogeneity': sum_{i,j=0}^{levels-1}frac{P_{i,j}}{1+(i-j)^2}`
+        # 'correlation': sum_{i,j=0}^{levels-1} P_{i,j}left[frac{(i-mu_i)(j-mu_j)}{sqrt{(sigma_i^2)(sigma_j^2)}}right]
+        pass
