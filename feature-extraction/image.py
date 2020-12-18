@@ -43,6 +43,9 @@ class image:
         self.setFilename(_filename)
         self.setImage(_filename)
 
+    def getBinaryImage(self):
+        return self.binaryImage
+
     def getImage(self):
         """
         Método que retorna o objeto Image (PIL)
@@ -92,8 +95,10 @@ class image:
             self.image = _filename
         else:
             self.image = cv.imread(_filename)
-            self.image = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
-            ret, self.image = cv.threshold(self.image, 240, 255, cv.THRESH_BINARY)
+            aux = self.image.copy()
+            aux = cv.cvtColor(aux, cv.COLOR_BGR2GRAY)
+            ret, self.binaryImage = cv.threshold(aux, 240, 255, cv.THRESH_BINARY)
+
             
 
     def setFilename(self, _filename):
@@ -109,7 +114,7 @@ class image:
         """
         self.filename = _filename
 
-    def find_next_non_white_pixel(self, image, x, y):
+    def find_next_non_white_pixel(self, _image, x, y):
         """
         Função que procura o pixel não branco mais proximo.
         ------------------------------------------------
@@ -128,10 +133,10 @@ class image:
         """
         i = x
         j = y
-        while i < image.shape[0]:
+        while i < _image.shape[0]:
             j = 0
-            while j < image.shape[1]:
-                if image[i][j] != 255:
+            while j < _image.shape[1]:
+                if _image[i][j] != 255:
                 #if image[i][j][0] != 255 or image[i][j][1] != 255 or image[i][j][2] != 255:
                     return (i, j)
                 j += 1
@@ -154,7 +159,7 @@ class image:
         k = [c[0] - b[0], c[1] - b[1]]
         return inverse_neighbors[str(k)]
 
-    def eight_neighborhood(self, image, b, c):
+    def eight_neighborhood(self, _image, b, c):
         """
         Função que faz C rodar em volta de B, e retorna o 1º pixel diferente de branco.
         ------------------------------------------------------------------------------
@@ -180,7 +185,7 @@ class image:
                 flag = True
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
-                if image[x][y] != 255:
+                if _image[x][y] != 255:
                 #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
@@ -192,7 +197,7 @@ class image:
             if i == 'n_'+str(self.find_neigh(b, c)) or flag:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
-                if image[x][y] != 255:
+                if _image[x][y] != 255:
                 #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
@@ -200,7 +205,7 @@ class image:
             previous_neigh = neighbors[i]
 
     #passos 3 a 5 algoritimo
-    def explore_frontier(self, image, b, c, end):
+    def explore_frontier(self, _image, b, c, end):
         """
         Função que explora a borda de um elemento encontrado
         -----------------------------------------------------------------------------
@@ -223,14 +228,14 @@ class image:
         border.append(b)
         
         while not(functools.reduce(lambda i, j : i and j, map(lambda p, q : p == q, border[-1], end), True)):
-            b, c = self.eight_neighborhood(image, border[-1], c)
+            b, c = self.eight_neighborhood(_image, border[-1], c)
             border.append(b)
 
         return border
 
 
     #passos 1 e 2 do algoritimo
-    def segmentation(self, image):
+    def segmentation(self, _image):
         """
         Função que realiza o processo de segmentação da imagem completa. E grava em disco as imagens segmentadas de borda e da folha completa
         -------------------------------------------------------------------------------------------------------------------------------------
@@ -242,15 +247,15 @@ class image:
         Retorno:\n
             \tnão possui retorno(PODE MUDAR)
         """
-        plt.imshow(self.image)
+        #plt.imshow(_image)
         #plt.show()
-        b0 = self.find_next_non_white_pixel(image, 0, 0)
+        b0 = self.find_next_non_white_pixel(_image, 0, 0)
         c0 = [b0[0]-1, b0[1]]
 
-        b, c = self.eight_neighborhood(image, b0, c0)
+        b, c = self.eight_neighborhood(_image, b0, c0)
 
 
-        frontier = self.explore_frontier(image, b, c, b0)
+        frontier = self.explore_frontier(_image, b, c, b0)
         frontier.insert(0, b0)
         x = []
         y = []
@@ -259,65 +264,54 @@ class image:
             y.append(i[1])
 
         plt.plot(y, x)
-        plt.show()
-        """
-        #Código abaixo tenta salvar uma img nova, mas não está funcioando
+        #plt.show()
+
+        width = max(x) - min(x) 
+        height = max(y) - min(y)
+        #print(width)
+        #print(height)
         
-        frontier_matrix = np.array(frontier)
-
-        # define dimensões da sub-imagem
-        min_y = np.min(frontier_matrix[:,0])
-        max_y = np.max(frontier_matrix[:,0])
-        min_x = np.min(frontier_matrix[:,1])
-        max_x = np.max(frontier_matrix[:,1])
-        frontier_height = max_y - min_y
-        frontier_width  = max_x - min_x
-
-        # padding de 1 ao redor da fronteira
-        new_height = frontier_height+1
-        new_width = frontier_width+1
-        border_img = np.zeros((new_height, new_width))
-
-        # reposiciona as coordernadas de frontier_matrix para o canto superior esquerdo
-        frontier_matrix = frontier_matrix - [min_y, min_x]
-
-        # transfere a fronteira para "border_img"
-        for f in frontier_matrix:
-            border_img[f[0], f[1]] = 1
-        
-        # cria máscar "mask" que será utilizada para extrair a sub-imagem da imagem original
-        mask = copy.deepcopy(border_img)
-        mask = ndimage.binary_fill_holes(mask).astype(int)
-
-        # adiciona 3ª dimensão em mask3D para que o broadcast seja possível
-        mask3D = np.zeros((new_height, new_width, 1))
-        # pega os valores de mask
-        mask3D[:,:,0] = mask
-        # converte mask3D em uma matriz booleana
-        mask3D = np.array(mask3D, dtype=bool)
-        
-        # aplica máscara "mask" sobre a imagem original, extraindo a subimagem "new_img"
-        new_img = np.zeros((new_height, new_width,3))
-        new_img = np.multiply(image[min_y:max_y+1, min_x:max_x+1], mask3D)
-        img[min_y:max_y+1, min_x:max_x+1,:] = np.multiply(image[min_y:max_y+1, min_x:max_x+1], np.logical_not(mask3D))
-
-        # troca fundos pretos da aplicação da máscara por fundos brancos
-        new_img = np.where(mask3D==[0],[255,255,255], new_img)
-        img_part = np.where(mask3D==[0], image[min_y:max_y+1, min_x:max_x+1], [255,255,255])
-        img[min_y:max_y+1, min_x:max_x+1] = img_part
-              
-        # transforma imagem de borda em imagem RGB
-        # determina os valores de "border_rgb", trocando fundo preto da imagem de borda por fundo branco e deixa o contorno preto
-        border_test = np.where(border_img==0, 255, 0)
-        border_rgb = np.stack((border_test, border_test, border_test),axis=-1)
-
-        # pega o perimetro da sub-imagem
-        perimeter = len(frontier)
-
-        cv.imwrite('Entradas/teste.png', new_img)
-
-        """
+        self.floodFillRecur(_image, self.getImage, self.createNewImage(width, height), frontier[0][1], frontier[0][0])
 
         return frontier
+
+    def createNewImage(self, width, height):
+        newImage = np.zeros((width, height))
+        #print(newImage.shape)
+        i = 0
+        j = 0
+
+        while (i < width):
+            j = 0
+            while (j < height):
+                newImage[i][j] = 255
+                j = j + 1
+            i = i + 1
+        
+        #print(newImage)
+        return newImage
+
+    def floodFillRecur(self, binaryImage, rgbImage, newImage, x, y):
+        #print(newImage)
+        #print(x, y)
+        if (x < 0 or x >= binaryImage.shape[0] or y < 0 or y >= binaryImage.shape[1] or binaryImage[x][y] != 0):
+            #print(image)
+            plt.plot(newImage)
+            plt.show()
+            return
+
+        binaryImage[x][y] = 255
+        newImage[x][y] = rgbImage[x][y]
+    
+        self.floodFillRecur(binaryImage, rgbImage, newImage, x + 1, y)
+        self.floodFillRecur(binaryImage, rgbImage, newImage, x - 1, y)
+        self.floodFillRecur(binaryImage, rgbImage, newImage, x, y + 1)
+        self.floodFillRecur(binaryImage, rgbImage, newImage, x, y - 1)
+
+        
+
+
+
+
 
         
