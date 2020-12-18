@@ -334,7 +334,6 @@ class image:
                     if 0 <= i < levels and 0 <= j < levels:
                         out[i, j, d, a] += 1
 
-
     """ 
         Contraste (isso também é chamado de "variação da soma dos quadrados"
         e, ocasionalmente, "inércia" (inertia)):
@@ -368,3 +367,11 @@ class image:
     def glcmprops(self, greylevel, prop='contrast'):
         
         pass
+
+    def generate_csv_and_save(self, image):
+        img_array = (image.flatten())
+        img_array = img_array.reshape(-1, 1).T
+
+        #print(img_array)
+        with open('output.csv', 'ab') as f:
+            np.savetxt(f, img_array, delimiter=",")
