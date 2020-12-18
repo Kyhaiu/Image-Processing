@@ -275,3 +275,8 @@ class image:
         #cv.imshow('Gray Image', gray)
         # cv.waitKey(0)
         # cv.destroyAllWindows()
+
+    def matrix(self, image):
+        distance = 1
+        angle = 0
+        shades_gray = 8
