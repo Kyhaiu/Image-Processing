@@ -28,7 +28,7 @@ inverse_neighbors ={
 }
 
 class image:
-    def __init__(self, _filename):
+    def __init__(self, _path, _filename):
         """
             Constutor da classe image
             -------------------------
@@ -41,7 +41,12 @@ class image:
                 None
         """
         self.setFilename(_filename)
-        self.setImage(_filename)
+        self.setPath(_path)
+        self.setImage(_path + '\\' + _filename)
+        
+
+    def getPath(self):
+        return self.path
 
     def getImage(self):
         """
@@ -68,6 +73,12 @@ class image:
             Image caminho + nome do arquivo
         """
         return self.filename
+
+    def getBinaryImage(self):
+        return self.binaryImage
+
+    def setPath(self, _path):
+        self.path = _path
 
     #cria uma instancia virtual da imagem(copia ela pra memoria)
     def setImage(self, _filename, memory=False):
@@ -138,6 +149,7 @@ class image:
                     return (i, j)
                 j += 1
             i += 1
+        #return -1
 
     def find_neigh(self, b, c):
         """
@@ -244,7 +256,7 @@ class image:
         Retorno:\n
             \tnão possui retorno(PODE MUDAR)
         """
-        plt.imshow(self.image)
+        #plt.imshow(self.image)
         #plt.show()
         b0 = self.find_next_non_white_pixel(image, 0, 0)
         c0 = [b0[0]-1, b0[1]]
@@ -260,20 +272,31 @@ class image:
             x.append(i[0])
             y.append(i[1])
 
-        plt.plot(y, x) 
+        #plt.plot(y, x) 
         self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y))
+        #plt.imshow(self.getImage())
+        #plt.show()
 
         width = max(x) - min(x)
         height = max(y) - min(y)
+
+        h, w = self.binaryImage.shape[:2]
+
+        #plt.imshow(self.getImage())
+        #plt.show()
+
+        self.floodFill(h, w, frontier[0][1], frontier[0][0])
         
-        self.createNewImage(width, height, frontier, max(x), max(y))
+        plt.imshow(self.getBinaryImage())
+        plt.show()
+        self.saveBorder(width, height, frontier, max(x), max(y))
 
 
         #print(frontier)
 
         return frontier
 
-    def createNewImage(self, width, height, frontier, xMax, yMax):
+    def saveBorder(self, width, height, frontier, xMax, yMax):
         newImage = np.zeros((height, width))
         
         print(newImage.shape)
@@ -294,6 +317,7 @@ class image:
             i+=1
         
         fliped = np.fliplr(newImage)
+        
 
         #(h, w) = fliped.shape[:2]
         #center = (w / 2, h / 2)
@@ -302,16 +326,21 @@ class image:
         #rotated = cv.warpAffine(fliped, M, (w, h))
 
         image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
-
-        cv.imshow("folhinha", image)
-        cv.waitKey(0)
-        
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","") +" - 0 - P.png"  , image)
+        #cv.imshow("folhinha", image)
+        #cv.waitKey(0)
+        del fliped, image
         #print(newImage)
-        return newImage
+        #return newImage
 
     def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax):
         cropedImage = rgbImage[xMin:xMax, yMin:yMax]
         #cv.imshow("folhinha", cropedImage)
-        cv.imwrite("teste.png", cropedImage)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","") +" - 0.png"  , cropedImage)
         #cv.waitKey(0)
+
+    def floodFill (self, h, w, x, y):
+        mask = np.zeros((h+2, w+2), np.uint8)
+
+        cv.floodFill(self.binaryImage, mask, (x, y), 255)
         
