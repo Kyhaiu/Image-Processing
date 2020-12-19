@@ -41,7 +41,7 @@ def main():
 
     images = [img.image(path, filename) for filename in image_files]
     
-    t = images[0].segmentation(images[0].getBinaryImage())
+    t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
     #print(t)
 
 

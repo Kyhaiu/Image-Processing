@@ -105,7 +105,9 @@ class image:
             self.image = cv.imread(_filename)
             aux = self.image.copy()
             aux = cv.cvtColor(aux, cv.COLOR_BGR2GRAY)
-            ret, self.binaryImage = cv.threshold(aux, 240, 255, cv.THRESH_BINARY)
+            ret, self.binaryImage = cv.threshold(aux, 245, 255, cv.THRESH_BINARY)
+           # plt.imshow(self.binaryImage)
+           # plt.show()
             del aux, ret
 
 
@@ -143,13 +145,13 @@ class image:
         j = y
         while i < image.shape[0]:
             j = 0
-            while j < image.shape[1]:
-                if image[i][j] != 255:
-                #if image[i][j][0] != 255 or image[i][j][1] != 255 or image[i][j][2] != 255:
-                    return (i, j)
-                j += 1
+            if np.mean(image[i]) != 255:
+                while j < image.shape[1]:
+                    if image[i][j] != 255:
+                        return (i, j)
+                    j += 1
             i += 1
-        #return -1
+        return (-1, -1)
 
     def find_neigh(self, b, c):
         """
@@ -212,6 +214,8 @@ class image:
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
             previous_neigh = neighbors[i]
+        
+        return ([-1,-1],-1)
 
     #passos 3 a 5 algoritimo
     def explore_frontier(self, image, b, c, end):
@@ -244,7 +248,7 @@ class image:
 
 
     #passos 1 e 2 do algoritimo
-    def segmentation(self, image):
+    def segmentation(self, image, r, c):
         """
         Função que realiza o processo de segmentação da imagem completa. E grava em disco as imagens segmentadas de borda e da folha completa
         -------------------------------------------------------------------------------------------------------------------------------------
@@ -258,49 +262,72 @@ class image:
         """
         #plt.imshow(self.image)
         #plt.show()
+        cont = 1
         b0 = self.find_next_non_white_pixel(image, 0, 0)
         c0 = [b0[0]-1, b0[1]]
+        while b0[0] != -1 :
 
-        b, c = self.eight_neighborhood(image, b0, c0)
+            b, c = self.eight_neighborhood(image, b0, c0)
+            if c == -1:
+                self.binaryImage[b0[0]][b0[1]] = 255
+                b0 = self.find_next_non_white_pixel(image, 0, 0)
+                c0 = [b0[0]-1, b0[1]]
+                continue
+            print("b: ", b, " c: ",c )
 
+            frontier = self.explore_frontier(image, b, c, b0)
+            frontier.insert(0, b0)
 
-        frontier = self.explore_frontier(image, b, c, b0)
-        frontier.insert(0, b0)
-        x = []
-        y = []
-        for i in frontier:
-            x.append(i[0])
-            y.append(i[1])
+            h, w = self.binaryImage.shape[:2]
+            if len(frontier) <= 100:
+                self.removeNoise(frontier)
+                b0 = self.find_next_non_white_pixel(image, 0, 0)
+                c0 = [b0[0]-1, b0[1]]
+                continue
 
-        #plt.plot(y, x) 
-        self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y))
-        #plt.imshow(self.getImage())
-        #plt.show()
+            x = []
+            y = []
+            for i in frontier:
+                x.append(i[0])
+                y.append(i[1])
 
-        width = max(x) - min(x)
-        height = max(y) - min(y)
+            #plt.plot(y, x) 
+            self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont)
+            #plt.imshow(self.getImage())
+            #plt.show()
 
-        h, w = self.binaryImage.shape[:2]
+            width = max(x) - min(x)
+            height = max(y) - min(y)
 
-        #plt.imshow(self.getImage())
-        #plt.show()
+            #plt.imshow(self.getImage())
+            #plt.show()
 
-        self.floodFill(h, w, frontier[0][1], frontier[0][0])
+            self.floodFill(h, w, frontier[0][1], frontier[0][0])
+            
+            self.saveBorder(width, height, frontier, max(x), max(y), cont)
+
+            cont+=1
+            print("contador: ", cont)
+            b0 = self.find_next_non_white_pixel(image, 0, 0)
+            c0 = [b0[0]-1, b0[1]]
+            print ("b0 :", b0)
+
+            #plt.imshow(self.getBinaryImage())
+            #plt.show()
+            #del b0, c0, b, c, frontier, x, y, width, height, h, w
+            
         
-        plt.imshow(self.getBinaryImage())
-        plt.show()
-        self.saveBorder(width, height, frontier, max(x), max(y))
+    def removeNoise(self, frontier):
+        print("shape: ", self.binaryImage.shape)
+        for i in frontier:
+            self.binaryImage[i[0]][i[1]] = 255    
 
 
-        #print(frontier)
-
-        return frontier
-
-    def saveBorder(self, width, height, frontier, xMax, yMax):
+    def saveBorder(self, width, height, frontier, xMax, yMax, cont):
         newImage = np.zeros((height, width))
         
-        print(newImage.shape)
-        print(height, width)
+        #print(newImage.shape)
+        #print(height, width)
         i = 0
         j = 0
 
@@ -326,17 +353,17 @@ class image:
         #rotated = cv.warpAffine(fliped, M, (w, h))
 
         image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","") +" - 0 - P.png"  , image)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +" - P.png"  , image)
         #cv.imshow("folhinha", image)
         #cv.waitKey(0)
         del fliped, image
         #print(newImage)
         #return newImage
 
-    def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax):
+    def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax, cont):
         cropedImage = rgbImage[xMin:xMax, yMin:yMax]
         #cv.imshow("folhinha", cropedImage)
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","") +" - 0.png"  , cropedImage)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +".png"  , cropedImage)
         #cv.waitKey(0)
 
     def floodFill (self, h, w, x, y):
