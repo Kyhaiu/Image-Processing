@@ -459,19 +459,85 @@ class image:
 
         cv.floodFill(self.binaryImage, mask, (x, y), 255)
 
-    
+    def grayscale(self, image):
+        image = cv.imread(
+            "C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Entradas\\Teste01.png")
+        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+
+        # Change the current directory to specified directory
+        os.chdir("C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Grayscale")
+        cv.imwrite("Teste01Gray.png", gray)
+
+        #cv.imshow('Original Image', image)
+        #cv.imshow('Gray Image', gray)
+        # cv.waitKey(0)
+        # cv.destroyAllWindows()
+
+    def glmc(self, image, distances, angles, levels=None, symmetric=False):
+        image = np.ascontiguousarray(image)
+
+        image_max = image.max()         # Maior tom de cor que existe na imagem
+
+        """
+            O argumento de níveis (levels) é necessário para tipos de dados diferentes
+            de uint8. A matriz resultante terá pelo menos níveis 2 de tamanho.
+            
+            O valor máximo da escala de cinza na imagem deve ser menor que o número de níveis (levels).
+        """
+        if levels is None:
+            levels = 256
+
+        distances = np.ascontiguousarray(distances, dtype=np.float64)
+        angles = np.ascontiguousarray(angles, dtype=np.float64)
+
+        P = np.zeros((levels, levels, len(distances), len(angles)),
+                    dtype=np.uint32, order='C')
+
+        # Contagem de co-ocorrências
+        self.glcm_loop(image, distances, angles, levels, P)
+
+        # Faça cada GLMC simétrico
+        if symmetric:
+            Pt = np.transpose(P, (1, 0, 2, 3))
+            P = P + Pt
+
+        return P
+
+    def glcm_loop(self, image, distances, angle, levels, out):
+        rows = image.shape[0]
+        cols = image.shape[1]
+
+        a = 0
+
+        for d in range(distances.shape[0]):
+            distance = distances[d]
+            offset_row = round(sin(angle) * distance)
+            offset_col = round(cos(angle) * distance)
+            start_row = max(0, -offset_row)
+            end_row = min(rows, rows - offset_row)
+            start_col = max(0, -offset_col)
+            end_col = min(cols, cols - offset_col)
+            for r in range(start_row, end_row):
+                for c in range(start_col, end_col):
+                    i = image[r, c]
+                    # Calcula a localização do pixel de deslocamento
+                    row = r + offset_row
+                    col = c + offset_col
+                    j = image[row, col]
+                    if 0 <= i < levels and 0 <= j < levels:
+                        out[i, j, d, a] += 1
 
     def glcmprops(self, P, prop='contrast'):
         
         (num_level, num_level2, num_dist, num_angle) = P.shape
 
-        # Normalize each GLCM
+        # Normaliza cada GLCM
         P = P.astype(np.float64)
         glcm_sums = np.apply_over_axes(np.sum, P, axes=(0, 1))
         glcm_sums[glcm_sums == 0] = 1
         P /= glcm_sums
 
-        # Create weights for specified property
+        # Crie pesos para a propriedade especificada
         I, J = np.ogrid[0:num_level, 0:num_level]
         if prop == 'contrast':
             weights = (I - J) ** 2
@@ -495,12 +561,12 @@ class image:
             cov = np.apply_over_axes(np.sum, (P * (diff_i * diff_j)),
                                     axes=(0, 1))[0, 0]
 
-            # handle the special case of standard deviations near zero
+            # Lida com o caso especial de desvios padrão perto de zero
             mask_0 = std_i < 1e-15
             mask_0[std_j < 1e-15] = True
             results[mask_0] = 1
 
-            # handle the standard case
+            # Lida com o caso padrão
             mask_1 = mask_0 == False
             results[mask_1] = cov[mask_1] / (std_i[mask_1] * std_j[mask_1])
         else:

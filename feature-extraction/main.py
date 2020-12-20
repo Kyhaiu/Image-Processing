@@ -25,8 +25,20 @@ def main():
     images = None
     for i in image_files:
         images = img.image(path, i)
-        print("Começando a segmentar o arquivo: ", image_files)
-        images.segmentation(images.getBinaryImage(), 0, 0)
+        print("Arquivo: ", image_files)
+        seg_image = images.segmentation(images.getBinaryImage(), 0, 0)
+        gray_image = images.grayscale(seg_image)
+        glmc = images.glmc(gray_image, 1, 0, levels=8)
+        contrast = image_files[i].glcmprops(glmc, 'contrast')
+        homogeneity = image_files[i].glcmprops(glmc, 'homogeneity')
+        correlation = image_files[i].glcmprops(glmc, 'correlation')
+
+        print("Grayscale: ", gray_image)
+        print("GLMC: ", glmc)
+        print("Contrast: ", contrast)
+        print("Homogeneity: ", homogeneity)
+        print("Correlation: ", correlation)
+
 
     #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
     #print(t)
