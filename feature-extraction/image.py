@@ -76,9 +76,29 @@ class image:
         return self.filename
 
     def getBinaryImage(self):
+        """
+        Função que retorna a imagem binária
+        -----------------------------------
+
+        Paramentros:
+            \tNenhum\n
+
+        Retorno:
+            \treturn: Retorna a imagem binária
+        """
         return self.binaryImage
 
     def setPath(self, _path):
+        """
+        Função que armazena o caminho do arquivo
+        ----------------------------------------
+
+        Paramentros:
+            \t_path: String que indica o caminho do arquivo
+
+        Retorno:
+            \treturn: None
+        """
         self.path = _path
 
     #cria uma instancia virtual da imagem(copia ela pra memoria)
@@ -314,11 +334,34 @@ class image:
             
         
     def removeNoise(self, frontier):
+        """
+        Função que remove ruidos encontrados durante a segmentação
+        ----------------------------------------------------------
+
+        Paramentros:
+            \tfrontier: Lista de indices (x, y) dos pixels de ruidos a serem removidos\n
+
+        Retorno:
+            return: não possui, pois opera diretamente na matriz da imagem binária
+        """
         for i in frontier:
             self.binaryImage[i[0]][i[1]] = 255    
 
 
     def saveBorder(self, width, height, frontier, xMax, yMax, cont):
+        """
+        Função que salva a borda da folha segmentada
+        -----------------------------------------------------
+        Parametros:
+            \twidth: Largura da imagem obtido atravéz de xMax - xMin\n
+            \theight: Altura da imagem obtida atravéz de yMax - yMin\n
+            \tcont: Variavel usada pra salvar com o nome correto\n
+            \tfrontier: Array que contem todos os pontos da fronteira\n
+
+        Retorno
+        -------
+            return: Nada por enquanto
+        """
         print("Salvando cópia da borda da folha segmentada.")
         print("Borda : " + self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
         newImage = np.zeros((height, width))
@@ -350,6 +393,20 @@ class image:
         
 
     def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax, cont, frontier):
+        """
+        Função que recorta e salva a folha, com base na borda
+        -----------------------------------------------------
+        Parametros:
+            \trgbImage: Imagem completa colorida\n
+            \txMin; yMin: Indices minimos obtidos atravéz da borda\n
+            \txMax; yMax: Indices maximos obtidos atravéz da borda\n
+            \tcont: Variavel usada pra salvar com o nome correto\n
+            \tfrontier: Array que contem todos os pontos da fronteira\n
+
+        Retorno
+        -------
+            \treturn: Nada por enquanto
+        """
         print("Salvando cópia da folha segmentada.")
         print("Folha : " + self.getFilename().replace(".png"," ") + str(cont) + ".png")
         mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
@@ -381,138 +438,21 @@ class image:
         perimeter = len(frontier)
         cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," - ") + str(cont) +".png"  , new_img)
 
-        self.glmc(new_img, 1, 0, levels=)
-        
+        del mask, mask3D, img_part
 
     def floodFill (self, h, w, x, y):
+        """
+        Função unica e exclusivamente para remover o objeto da imagem binária
+        ---------------------------------------------------------------------
+
+        Paramentros:
+            \th: Altura da imagem(xMax - xMin)\n
+            \tw: Largura da imagem(yMax -yMin)\n
+            \tx;y: Indice de onde o floodfill irá começar
+
+        Retorno:
+            \treturn: None
+        """
         mask = np.zeros((h+2, w+2), np.uint8)
 
         cv.floodFill(self.binaryImage, mask, (x, y), 255)
-
-    
-      ############################################################
-      def grayscale(self, image):
-        image = cv.imread(
-            "C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Entradas\\Teste01.png")
-        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-        # Change the current directory to specified directory
-        os.chdir("C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Grayscale")
-        cv.imwrite("Teste01Gray.png", gray)
-
-        #cv.imshow('Original Image', image)
-        #cv.imshow('Gray Image', gray)
-        # cv.waitKey(0)
-        # cv.destroyAllWindows()
-
-    def glmc(self, image, distances, angles, levels=None, symmetric=False):
-        image = np.ascontiguousarray(image)
-
-        image_max = image.max()         # Maior tom de cor que existe na imagem
-
-        """
-            O argumento de níveis (levels) é necessário para tipos de dados diferentes
-            de uint8. A matriz resultante terá pelo menos níveis 2 de tamanho.
-            
-            O valor máximo da escala de cinza na imagem deve ser menor que o número de níveis (levels).
-        """
-        if levels is None:
-            levels = 256
-
-        distances = np.ascontiguousarray(distances, dtype=np.float64)
-        angles = np.ascontiguousarray(angles, dtype=np.float64)
-
-        P = np.zeros((levels, levels, len(distances), len(angles)),
-                    dtype=np.uint32, order='C')
-
-        # Contagem de co-ocorrências
-        self.glcm_loop(image, distances, angles, levels, P)
-
-        # Faça cada GLMC simétrico
-        if symmetric:
-            Pt = np.transpose(P, (1, 0, 2, 3))
-            P = P + Pt
-
-        return P
-
-    def glcm_loop(self, image, distances, angle, levels, out):
-        rows = image.shape[0]
-        cols = image.shape[1]
-
-        a = 0
-
-        for d in range(distances.shape[0]):
-            distance = distances[d]
-            offset_row = round(sin(angle) * distance)
-            offset_col = round(cos(angle) * distance)
-            start_row = max(0, -offset_row)
-            end_row = min(rows, rows - offset_row)
-            start_col = max(0, -offset_col)
-            end_col = min(cols, cols - offset_col)
-            for r in range(start_row, end_row):
-                for c in range(start_col, end_col):
-                    i = image[r, c]
-                    # Calcula a localização do pixel de deslocamento
-                    row = r + offset_row
-                    col = c + offset_col
-                    j = image[row, col]
-                    if 0 <= i < levels and 0 <= j < levels:
-                        out[i, j, d, a] += 1
-
-    """ 
-        Contraste (isso também é chamado de "variação da soma dos quadrados"
-        e, ocasionalmente, "inércia" (inertia)):
-            Quando i e j são iguais, a célula está na diagonal e (i-j) = 0.
-            Esses valores representam pixels inteiramente semelhantes ao seu
-            vizinho, então eles recebem um peso de 0 (sem contraste). Se i e
-            j diferem por 1, há um pequeno contraste, e o peso é 1. Se i e j
-            diferem por 2 , o contraste está aumentando e o peso é 4. Os pesos
-            continuam a aumentar exponencialmente à medida que (ij) aumenta.
-
-        Uniformidade:
-            Dissimilaridade e contraste resultam em números maiores para mais
-            janelas mostrando mais contraste. Se os pesos diminuirem na diagonal,
-            a medida de textura calculada será maior para janelas com pouco contraste.
-            A homogeneidade pondera os valores pelo inverso do peso do contraste, com
-            os pesos diminuindo exponencialmente em relação à diagonal.
-
-        Correlação:
-            A textura de correlação mede a dependência linear dos níveis de cinza
-            daqueles dos pixels vizinhos.
-            O que significa correlação? Correlação entre pixels significa que há
-            uma relação previsível e linear entre os dois pixels vizinhos dentro
-            da janela, expressa pela equação de regressão. Exemplo: suponha que
-            haja uma correlação muito alta entre o pixel de referência e vizinho,
-            expressa por n = 2r + 2 , onde n é o valor do vizinho e r da referência.
-            Portanto, se r = 1, é muito provável que n seja igual a 4; se r = 4,
-            n = 10, etc.
-            Uma textura de alta correlação significa alta previsibilidade das
-            relações de pixel.
-    """
-    def glcmprops(self, greylevel, prop='contrast'):
-        
-        pass
-
-    def generate_csv_and_save(self, image):
-        """
-        No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
-        gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
-            - ID  Imagem(mesmo  nome  do  arquivo  de  entrada);
-            - ID  Folha(Inteiro sequencial, reiniciado para cada nova imagem de entrada);
-            - Propriedade 1, Propriedade 2, ..., Propriedade N.
-        
-        O perímetro também é propriedade a ser armazenada  no  arquivo  .csv,  bem
-        como as propriedades especificadas para cada uma das equipes, de acordo com
-        a lista abaixo.
-
-        Os campos devem, necessariamente serem separados por vírgula.
-        Valores fracionários devem usar o “.” como separador decimal.
-        """
-        img_array = (image.flatten())
-        img_array = img_array.reshape(-1, 1).T
-        #print(img_array)
-
-        with open('output.csv', 'ab') as f:
-            np.savetxt(f, img_array, delimiter=",") 
-        
-        
