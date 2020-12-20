@@ -191,12 +191,6 @@ class image:
         k = [c[0] - b[0], c[1] - b[1]]
         return inverse_neighbors[str(k)]
 
-    def out_limits(self, c):
-        if c[0] < 0 or c[1] < 0 or c[0] >= self.image.shape[0] or c[1] >= self.image.shape[1]:
-            return True
-        else:
-            return False
-
     def eight_neighborhood(self, image, b, c):
         """
         Função que faz C rodar em volta de B, e retorna o 1º pixel diferente de branco.
@@ -305,17 +299,25 @@ class image:
             frontier.insert(0, b0)
 
             h, w = self.binaryImage.shape[:2]
-            #print("iaia", len(frontier),  h-2 + h-2 + w-2 + w-2)
-            if len(frontier) <= 100 or len(frontier) >= h-3 + h-3 + w-3 + w-3:
+            if(len(frontier) >= (2*(h-2) + 2*(w-2)) - 4):
+                print("here")
+                self.floodFill(h, w, frontier[0][1], frontier[0][0])
+                b0 = self.find_next_non_white_pixel(image, 0, 0)
+                c0 = [b0[0]-1, b0[1]]
+                continue
+
+            if len(frontier) <= 100:
                 self.removeNoise(frontier)
                 b0 = self.find_next_non_white_pixel(image, 0, 0)
                 c0 = [b0[0]-1, b0[1]]
                 continue
+
             x = []
             y = []
             for i in frontier:
                 x.append(i[0])
                 y.append(i[1])
+
 
             width = max(x) - min(x)
             height = max(y) - min(y)
@@ -363,7 +365,7 @@ class image:
             return: Nada por enquanto
         """
         print("Salvando cópia da borda da folha segmentada.")
-        print("Borda : " + self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
+        print("Borda : " + self.getFilename().replace(".png","") + str(cont) + "-P.png")
         newImage = np.zeros((height, width))
         
         #print(newImage.shape)
@@ -387,7 +389,7 @@ class image:
     
 
         image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +" - P.png"  , image)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","") + str(cont) +"-P.png"  , image)
 
         del fliped, image
         
@@ -408,8 +410,8 @@ class image:
             \treturn: Nada por enquanto
         """
         print("Salvando cópia da folha segmentada.")
-        print("Folha : " + self.getFilename().replace(".png"," ") + str(cont) + ".png")
-        mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
+        print("Folha : " + self.getFilename().replace(".png","") + str(cont) + ".png")
+        mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png","") + str(cont) + "-P.png")
         frontier_matrix = np.array(frontier)
 
         frontier_height = yMax - yMin
@@ -436,7 +438,7 @@ class image:
         self.image[xMin:xMax+1, yMin:yMax+1] = img_part
 
         perimeter = len(frontier)
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," - ") + str(cont) +".png"  , new_img)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","-") + str(cont) +".png"  , new_img)
 
         del mask, mask3D, img_part
 

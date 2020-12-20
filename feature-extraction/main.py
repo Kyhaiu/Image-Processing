@@ -13,19 +13,19 @@ def main():
     path = input()
 
     image_files = []
-
+    k = 1
     for name in os.listdir(path):
         if os.path.isfile(path + '\\' + name):
-            image_files.append(name)
-    """
-    for i in image_files:
-        mask = cv.imread(path+"\\"+i)
-        plt.imshow(mask)
-    plt.show()
-    """
+            if name ==  "Teste" + str(k).zfill(2) + ".png":
+                image_files.append(name)
+                k += 1
+
+    print("Arquivos identificados: ", image_files)
+
     images = None
     for i in image_files:
         images = img.image(path, i)
+        print("Começando a segmentar o arquivo: ", image_files)
         images.segmentation(images.getBinaryImage(), 0, 0)
 
     #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
