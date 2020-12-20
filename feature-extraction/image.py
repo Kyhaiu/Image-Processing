@@ -197,7 +197,6 @@ class image:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
                 if image[x][y] != 255:
-                #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
@@ -284,27 +283,22 @@ class image:
                 b0 = self.find_next_non_white_pixel(image, 0, 0)
                 c0 = [b0[0]-1, b0[1]]
                 continue
-
+            #print(frontier)
             x = []
             y = []
             for i in frontier:
                 x.append(i[0])
                 y.append(i[1])
 
-            #plt.plot(y, x) 
-            self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont)
-            #plt.imshow(self.getImage())
-            #plt.show()
-
             width = max(x) - min(x)
             height = max(y) - min(y)
-
-            #plt.imshow(self.getImage())
-            #plt.show()
 
             self.floodFill(h, w, frontier[0][1], frontier[0][0])
             
             self.saveBorder(width, height, frontier, max(x), max(y), cont)
+
+            self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont)
+            
 
             cont+=1
             print("contador: ", cont)
@@ -354,20 +348,51 @@ class image:
 
         image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
         cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +" - P.png"  , image)
-        #cv.imshow("folhinha", image)
-        #cv.waitKey(0)
+
         del fliped, image
-        #print(newImage)
-        #return newImage
+        
 
     def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax, cont):
+        print("entrou na func")
+        mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
+        h, w = mask.shape[:2]
+        aux = np.zeros((h+2, w+2), np.uint8)
+
+        mask = cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
+        ret, mask = cv.threshold(mask, 245, 255, cv.THRESH_BINARY)
+        mask = cv.bitwise_not(mask)
+
+        
+
+        cv.floodFill(mask, aux, (int(w/2)-25,int(h/2)), 255)
+        i = 0
+        j = 0
         cropedImage = rgbImage[xMin:xMax, yMin:yMax]
-        #cv.imshow("folhinha", cropedImage)
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +".png"  , cropedImage)
-        #cv.waitKey(0)
+        image = np.zeros((cropedImage.shape[0], cropedImage.shape[1], 3))
+        while i < mask.shape[0]:
+            j = 0
+            while j < mask.shape[1]:
+                if mask[i][j] == 255:
+                    image[i][j] = [1, 1, 1]
+                elif mask[i][j] == 0:
+                    image[i][j] = [0, 0, 0]
+                j += 1
+            i += 1
+
+        cropedImage = rgbImage[xMin:xMax, yMin:yMax]
+        
+        
+        image = np.multiply(cropedImage, image)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +".png"  , image)
+        
+
+        
 
     def floodFill (self, h, w, x, y):
         mask = np.zeros((h+2, w+2), np.uint8)
 
         cv.floodFill(self.binaryImage, mask, (x, y), 255)
+
+    
+        
         

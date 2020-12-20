@@ -1,5 +1,7 @@
 import os
 import image as img
+import cv2 as cv
+from matplotlib import pyplot as plt
 
 
 def main():
@@ -15,33 +17,19 @@ def main():
     for name in os.listdir(path):
         if os.path.isfile(path + '\\' + name):
             image_files.append(name)
-    
     """
-            |  0   1   2   3   4   5   6
-            ------------------------------
-            0|   
-            1|          1   1   1   1
-            2|      1           1
-            3|          1       1
-            4|      1           1
-            5|      1   1   1   1
-            6|  
-       
-    im = [
-                [[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]],
-                [[255, 255, 255], [255, 255, 255], [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [255, 255, 255]],
-                [[255, 255, 255], [0, 0, 0]      , [255, 255, 255], [255, 255, 255], [0, 0, 0]      , [255, 255, 255], [255, 255, 255]],
-                [[255, 255, 255], [255, 255, 255], [0, 0, 0]      , [255, 255, 255], [0, 0, 0]      , [255, 255, 255], [255, 255, 255]],
-                [[255, 255, 255], [0, 0 ,0]      , [255, 255, 255], [255, 255, 255], [0, 0, 0]      , [255, 255, 255], [255, 255, 255]],
-                [[255, 255, 255], [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [0, 0, 0]      , [255, 255, 255], [255, 255, 255]],
-                [[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]
-                ]
+    for i in image_files:
+        mask = cv.imread(path+"\\"+i)
+        plt.imshow(mask)
+    plt.show()
     """
-    
 
     images = [img.image(path, filename) for filename in image_files]
-    
-    t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
+
+    for i in images:
+        i.segmentation(i.getBinaryImage(), 0, 0)
+
+    #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
     #print(t)
 
 
