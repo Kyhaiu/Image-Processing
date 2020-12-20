@@ -103,11 +103,13 @@ class image:
             self.image = _filename
         else:
             self.image = cv.imread(_filename)
+            self.image = cv.copyMakeBorder(self.image, 1, 1, 1, 1, cv.BORDER_CONSTANT, value=[255, 255, 255])
             aux = self.image.copy()
             aux = cv.cvtColor(aux, cv.COLOR_BGR2GRAY)
             ret, self.binaryImage = cv.threshold(aux, 245, 255, cv.THRESH_BINARY)
-           # plt.imshow(self.binaryImage)
-           # plt.show()
+            plt.imshow(self.binaryImage)
+            plt.show()
+
             del aux, ret
 
 
@@ -148,10 +150,10 @@ class image:
             if np.mean(image[i]) != 255:
                 while j < image.shape[1]:
                     if image[i][j] != 255:
-                        return (i, j)
+                        return [i, j]
                     j += 1
             i += 1
-        return (-1, -1)
+        return [-1, -1]
 
     def find_neigh(self, b, c):
         """
@@ -169,6 +171,12 @@ class image:
         """
         k = [c[0] - b[0], c[1] - b[1]]
         return inverse_neighbors[str(k)]
+
+    def out_limits(self, c):
+        if c[0] < 0 or c[1] < 0 or c[0] >= self.image.shape[0] or c[1] >= self.image.shape[1]:
+            return True
+        else:
+            return False
 
     def eight_neighborhood(self, image, b, c):
         """
@@ -192,15 +200,14 @@ class image:
         previous_neigh = None
         flag = False
         for i in neighbors:
-            if (i == 'n_'+str(self.find_neigh(b, c)) or flag):
+            if i == 'n_'+str(self.find_neigh(b, c)) or flag:
                 flag = True
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
-                if(x > self.image.shape[0] or y > self.image.shape[1]):
-                    continue
                 if image[x][y] != 255:
-                    c[0] = b[0] + previous_neigh[0]
-                    c[1] = b[1] + previous_neigh[1]
+                    if previous_neigh != None:
+                        c[0] = b[0] + previous_neigh[0]
+                        c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
             previous_neigh = neighbors[i]
 
@@ -209,11 +216,10 @@ class image:
             if i == 'n_'+str(self.find_neigh(b, c)) or flag:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
-                if(x > self.image.shape[0] or y > self.image.shape[1]):
-                    continue
                 if image[x][y] != 255:
-                    c[0] = b[0] + previous_neigh[0]
-                    c[1] = b[1] + previous_neigh[1]
+                    if previous_neigh != None:
+                        c[0] = b[0] + previous_neigh[0]
+                        c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
             previous_neigh = neighbors[i]
         
@@ -296,16 +302,14 @@ class image:
 
             self.floodFill(h, w, frontier[0][1], frontier[0][0])
             
-            #self.saveBorder(width, height, frontier, max(x), max(y), cont)
+            self.saveBorder(width, height, frontier, max(x), max(y), cont)
 
             self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont, frontier)
             
 
             cont+=1
-            print("contador: ", cont)
             b0 = self.find_next_non_white_pixel(image, 0, 0)
             c0 = [b0[0]-1, b0[1]]
-            print ("b0 :", b0)
 
             #plt.imshow(self.getBinaryImage())
             #plt.show()
@@ -313,7 +317,6 @@ class image:
             
         
     def removeNoise(self, frontier):
-        print("shape: ", self.binaryImage.shape)
         for i in frontier:
             self.binaryImage[i[0]][i[1]] = 255    
 
@@ -353,18 +356,17 @@ class image:
         del fliped, image
         
 
-    def cropAndSave(self, rgbImage, min_x, min_y, max_x, max_y, cont, frontier):
+    def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax, cont, frontier):
         print("entrou na func")
         mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
         frontier_matrix = np.array(frontier)
 
-        frontier_height = max_y - min_y
-        frontier_width  = max_x - min_x
-        print(frontier_height, frontier_width)
+        frontier_height = yMax - yMin
+        frontier_width  = xMax - xMin
         new_height = frontier_height+1
         new_width = frontier_width+1
-        border_img = np.zeros((new_width, new_height))
-        frontier_matrix = frontier_matrix - [min_x, min_y]
+        border_img = np.zeros((new_width, new_height), dtype=np.uint8)
+        frontier_matrix = frontier_matrix - [xMin, yMin]
         for f in frontier_matrix:
             border_img[f[0], f[1]] = 1
     
@@ -373,17 +375,14 @@ class image:
         mask3D = np.zeros((new_width, new_height, 1))
         mask3D[:,:,0] = mask
         mask3D = np.array(mask3D, dtype=bool)
-        new_img = np.zeros((new_height, new_width, 3))
-        new_img = np.multiply(self.image[min_x:max_x+1, min_y:max_y+1], mask3D)
+        new_img = np.zeros((new_height-1, new_width-1, 3), dtype=np.uint8)
+        new_img = np.multiply(self.image[xMin:xMax+1, yMin:yMax+1], mask3D)
 
-        self.image[min_x:max_x+1, min_y:max_y+1,:] = np.multiply(self.image[min_x:max_x+1, min_y:max_y+1], np.logical_not(mask3D))
+        self.image[xMin:xMax+1, yMin:yMax+1,:] = np.multiply(self.image[xMin:xMax+1, yMin:yMax+1], np.logical_not(mask3D))
 
         new_img = np.where(mask3D==[0],[255,255,255], new_img)
-        img_part = np.where(mask3D==[0], self.image[min_x:max_x+1, min_y:max_y+1], [255,255,255])
-        self.image[min_x:max_x+1, min_y:max_y+1] = img_part
-        
-        border_test = np.where(border_img==0, 255, 0)
-        border_rgb = np.stack((border_test, border_test, border_test),axis=-1)
+        img_part = np.where(mask3D==[0], self.image[xMin:xMax+1, yMin:yMax+1], [255,255,255])
+        self.image[xMin:xMax+1, yMin:yMax+1] = img_part
 
         perimeter = len(frontier)
         cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," - ") + str(cont) +".png"  , new_img)
