@@ -65,11 +65,15 @@ def main():
 
     result = images[0].glmc(im, 1, 0, levels=8)
 
-    #contraste = images[0].glcmprops(result, 'contrast')
-    #uniformidade = images[0].glcmprops(result, 'homogeneity')
-    #correlacao = images[0].glcmprops(result, 'correlation')
+    contraste = images[0].glcmprops(result, 'contrast')
+    uniformidade = images[0].glcmprops(result, 'homogeneity')
+    correlacao = images[0].glcmprops(result, 'correlation')
+    
+    print("Contraste: ", contraste)
+    print("Uniformidade: ", uniformidade)
+    print("Correlação: ", correlacao)
 
-    images[0].generate_csv_and_save(result)
+    #images[0].generate_csv_and_save(result)
 
 
 main()

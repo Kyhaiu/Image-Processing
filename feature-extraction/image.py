@@ -365,9 +365,53 @@ class image:
             Uma textura de alta correlação significa alta previsibilidade das
             relações de pixel.
     """
-    def glcmprops(self, greylevel, prop='contrast'):
+    def glcmprops(self, P, prop='contrast'):
         
-        pass
+        (num_level, num_level2, num_dist, num_angle) = P.shape
+
+        # Normalize each GLCM
+        P = P.astype(np.float64)
+        glcm_sums = np.apply_over_axes(np.sum, P, axes=(0, 1))
+        glcm_sums[glcm_sums == 0] = 1
+        P /= glcm_sums
+
+        # Create weights for specified property
+        I, J = np.ogrid[0:num_level, 0:num_level]
+        if prop == 'contrast':
+            weights = (I - J) ** 2
+            weights = weights.reshape((num_level, num_level, 1, 1))
+            results = np.apply_over_axes(np.sum, (P * weights), axes=(0, 1))[0, 0]
+        elif prop == 'homogeneity':
+            weights = 1. / (1. + (I - J) ** 2)
+            weights = weights.reshape((num_level, num_level, 1, 1))
+            results = np.apply_over_axes(np.sum, (P * weights), axes=(0, 1))[0, 0]
+        elif prop == 'correlation':
+            results = np.zeros((num_dist, num_angle), dtype=np.float64)
+            I = np.array(range(num_level)).reshape((num_level, 1, 1, 1))
+            J = np.array(range(num_level)).reshape((1, num_level, 1, 1))
+            diff_i = I - np.apply_over_axes(np.sum, (I * P), axes=(0, 1))[0, 0]
+            diff_j = J - np.apply_over_axes(np.sum, (J * P), axes=(0, 1))[0, 0]
+
+            std_i = np.sqrt(np.apply_over_axes(np.sum, (P * (diff_i) ** 2),
+                                            axes=(0, 1))[0, 0])
+            std_j = np.sqrt(np.apply_over_axes(np.sum, (P * (diff_j) ** 2),
+                                            axes=(0, 1))[0, 0])
+            cov = np.apply_over_axes(np.sum, (P * (diff_i * diff_j)),
+                                    axes=(0, 1))[0, 0]
+
+            # handle the special case of standard deviations near zero
+            mask_0 = std_i < 1e-15
+            mask_0[std_j < 1e-15] = True
+            results[mask_0] = 1
+
+            # handle the standard case
+            mask_1 = mask_0 == False
+            results[mask_1] = cov[mask_1] / (std_i[mask_1] * std_j[mask_1])
+        else:
+            print("Propriedade inválida!")
+            return P
+
+        return results
 
     def generate_csv_and_save(self, image):
         """
