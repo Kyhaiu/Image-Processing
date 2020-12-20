@@ -107,8 +107,6 @@ class image:
             aux = self.image.copy()
             aux = cv.cvtColor(aux, cv.COLOR_BGR2GRAY)
             ret, self.binaryImage = cv.threshold(aux, 245, 255, cv.THRESH_BINARY)
-            plt.imshow(self.binaryImage)
-            plt.show()
 
             del aux, ret
 
@@ -310,10 +308,6 @@ class image:
             cont+=1
             b0 = self.find_next_non_white_pixel(image, 0, 0)
             c0 = [b0[0]-1, b0[1]]
-
-            #plt.imshow(self.getBinaryImage())
-            #plt.show()
-            #del b0, c0, b, c, frontier, x, y, width, height, h, w
             
         
     def removeNoise(self, frontier):
@@ -322,6 +316,8 @@ class image:
 
 
     def saveBorder(self, width, height, frontier, xMax, yMax, cont):
+        print("Salvando cópia da borda da folha segmentada.")
+        print("Borda : " + self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
         newImage = np.zeros((height, width))
         
         #print(newImage.shape)
@@ -342,13 +338,7 @@ class image:
             i+=1
         
         fliped = np.fliplr(newImage)
-        
-
-        #(h, w) = fliped.shape[:2]
-        #center = (w / 2, h / 2)
-        # rotate the image by 180 degrees
-        #M = cv.getRotationMatrix2D(center, 90, 1.0)
-        #rotated = cv.warpAffine(fliped, M, (w, h))
+    
 
         image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
         cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +" - P.png"  , image)
@@ -357,7 +347,8 @@ class image:
         
 
     def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax, cont, frontier):
-        print("entrou na func")
+        print("Salvando cópia da folha segmentada.")
+        print("Folha : " + self.getFilename().replace(".png"," ") + str(cont) + ".png")
         mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
         frontier_matrix = np.array(frontier)
 
