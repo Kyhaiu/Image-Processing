@@ -192,10 +192,12 @@ class image:
         previous_neigh = None
         flag = False
         for i in neighbors:
-            if i == 'n_'+str(self.find_neigh(b, c)) or flag:
+            if (i == 'n_'+str(self.find_neigh(b, c)) or flag):
                 flag = True
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
+                if(x > self.image.shape[0] or y > self.image.shape[1]):
+                    continue
                 if image[x][y] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
@@ -207,8 +209,9 @@ class image:
             if i == 'n_'+str(self.find_neigh(b, c)) or flag:
                 x = b[0] + neighbors[i][0]
                 y = b[1] + neighbors[i][1]
+                if(x > self.image.shape[0] or y > self.image.shape[1]):
+                    continue
                 if image[x][y] != 255:
-                #if image[x][y][0] != 255 or image[x][y][1] != 255 or image[x][y][2] != 255:
                     c[0] = b[0] + previous_neigh[0]
                     c[1] = b[1] + previous_neigh[1]
                     return ([x, y], c)
@@ -272,7 +275,6 @@ class image:
                 b0 = self.find_next_non_white_pixel(image, 0, 0)
                 c0 = [b0[0]-1, b0[1]]
                 continue
-            print("b: ", b, " c: ",c )
 
             frontier = self.explore_frontier(image, b, c, b0)
             frontier.insert(0, b0)
@@ -283,7 +285,6 @@ class image:
                 b0 = self.find_next_non_white_pixel(image, 0, 0)
                 c0 = [b0[0]-1, b0[1]]
                 continue
-            #print(frontier)
             x = []
             y = []
             for i in frontier:
@@ -295,9 +296,9 @@ class image:
 
             self.floodFill(h, w, frontier[0][1], frontier[0][0])
             
-            self.saveBorder(width, height, frontier, max(x), max(y), cont)
+            #self.saveBorder(width, height, frontier, max(x), max(y), cont)
 
-            self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont)
+            self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont, frontier)
             
 
             cont+=1
@@ -352,38 +353,40 @@ class image:
         del fliped, image
         
 
-    def cropAndSave(self, rgbImage, xMin, yMin, xMax, yMax, cont):
+    def cropAndSave(self, rgbImage, min_x, min_y, max_x, max_y, cont, frontier):
         print("entrou na func")
         mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png"," ") + str(cont) + " - P.png")
-        h, w = mask.shape[:2]
-        aux = np.zeros((h+2, w+2), np.uint8)
+        frontier_matrix = np.array(frontier)
 
-        mask = cv.cvtColor(mask, cv.COLOR_BGR2GRAY)
-        ret, mask = cv.threshold(mask, 245, 255, cv.THRESH_BINARY)
-        mask = cv.bitwise_not(mask)
+        frontier_height = max_y - min_y
+        frontier_width  = max_x - min_x
+        print(frontier_height, frontier_width)
+        new_height = frontier_height+1
+        new_width = frontier_width+1
+        border_img = np.zeros((new_width, new_height))
+        frontier_matrix = frontier_matrix - [min_x, min_y]
+        for f in frontier_matrix:
+            border_img[f[0], f[1]] = 1
+    
+        mask = copy.deepcopy(border_img)
+        mask = ndimage.binary_fill_holes(mask).astype(int)
+        mask3D = np.zeros((new_width, new_height, 1))
+        mask3D[:,:,0] = mask
+        mask3D = np.array(mask3D, dtype=bool)
+        new_img = np.zeros((new_height, new_width, 3))
+        new_img = np.multiply(self.image[min_x:max_x+1, min_y:max_y+1], mask3D)
 
+        self.image[min_x:max_x+1, min_y:max_y+1,:] = np.multiply(self.image[min_x:max_x+1, min_y:max_y+1], np.logical_not(mask3D))
+
+        new_img = np.where(mask3D==[0],[255,255,255], new_img)
+        img_part = np.where(mask3D==[0], self.image[min_x:max_x+1, min_y:max_y+1], [255,255,255])
+        self.image[min_x:max_x+1, min_y:max_y+1] = img_part
         
+        border_test = np.where(border_img==0, 255, 0)
+        border_rgb = np.stack((border_test, border_test, border_test),axis=-1)
 
-        cv.floodFill(mask, aux, (int(w/2)-25,int(h/2)), 255)
-        i = 0
-        j = 0
-        cropedImage = rgbImage[xMin:xMax, yMin:yMax]
-        image = np.zeros((cropedImage.shape[0], cropedImage.shape[1], 3))
-        while i < mask.shape[0]:
-            j = 0
-            while j < mask.shape[1]:
-                if mask[i][j] == 255:
-                    image[i][j] = [1, 1, 1]
-                elif mask[i][j] == 0:
-                    image[i][j] = [0, 0, 0]
-                j += 1
-            i += 1
-
-        cropedImage = rgbImage[xMin:xMax, yMin:yMax]
-        
-        
-        image = np.multiply(cropedImage, image)
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," ") + str(cont) +".png"  , image)
+        perimeter = len(frontier)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png"," - ") + str(cont) +".png"  , new_img)
         
 
         

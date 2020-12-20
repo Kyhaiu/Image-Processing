@@ -23,11 +23,10 @@ def main():
         plt.imshow(mask)
     plt.show()
     """
-
-    images = [img.image(path, filename) for filename in image_files]
-
-    for i in images:
-        i.segmentation(i.getBinaryImage(), 0, 0)
+    images = None
+    for i in image_files:
+        images = img.image(path, i)
+        images.segmentation(images.getBinaryImage(), 0, 0)
 
     #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
     #print(t)
