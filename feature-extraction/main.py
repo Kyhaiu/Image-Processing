@@ -10,7 +10,8 @@ def main():
         Executa todo o programa, se quiser deixar constante a execução vc pode passar via prametro na main
     """
     print('Por favor informe o caminho das imagens a serem extraidas as caracteristicas: ')
-    path = input()
+    #path = input()
+    path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
 
     image_files = []
     k = 1
@@ -26,28 +27,16 @@ def main():
     for i in image_files:
         images = img.image(path, i)
         print("Arquivo: ", image_files)
-        seg_image = images.segmentation(images.getBinaryImage(), 0, 0)
-        gray_image = images.grayscale(seg_image)
-        glmc = images.glmc(gray_image, 1, 0, levels=8)
-        contrast = image_files[i].glcmprops(glmc, 'contrast')
-        homogeneity = image_files[i].glcmprops(glmc, 'homogeneity')
-        correlation = image_files[i].glcmprops(glmc, 'correlation')
-
-        print("Grayscale: ", gray_image)
-        print("GLMC: ", glmc)
-        print("Contrast: ", contrast)
-        print("Homogeneity: ", homogeneity)
-        print("Correlation: ", correlation)
-
+        image = images.segmentation(images.getBinaryImage(), 0, 0)
 
     #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
     #print(t)
 
     """
     im = np.array([[0, 0, 1, 1],
-                    [0, 0, 1, 1],
-                    [0, 2, 2, 2],
-                    [2, 2, 3, 3]], dtype=np.uint8)
+                   [0, 0, 1, 1],
+                   [0, 2, 2, 2],
+                   [2, 2, 3, 3]], dtype=np.uint8)
 
         # O resultado é esse, tem esse quantidade de zero, porque
         # o level utilizado para tons de cinza foi 8, logo (8x8).

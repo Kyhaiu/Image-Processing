@@ -327,8 +327,21 @@ class image:
                 
             self.saveBorder(width, height, frontier, max(x), max(y), cont)
 
-            self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont, frontier)
-                
+            cropped_image = self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont, frontier)
+
+            gray_image = self.grayscale(cropped_image)
+            gray_image = np.array(gray_image, dtype=np.uint8)
+            glmc = self.glmc(gray_image, 1, 0, levels=255)
+            contrast = self.glcmprops(glmc, 'contrast')
+            homogeneity = self.glcmprops(glmc, 'homogeneity')
+            correlation = self.glcmprops(glmc, 'correlation')
+
+            print("Grayscale: ", gray_image)
+            print("GLMC: ", glmc)
+            print("Contrast: ", contrast)
+            print("Homogeneity: ", homogeneity)
+            print("Correlation: ", correlation)
+            input()
 
             cont+=1
             b0 = self.find_next_non_white_pixel(image, 0, 0)
@@ -442,6 +455,8 @@ class image:
 
         del mask, mask3D, img_part
 
+        return new_img
+
     def floodFill (self, h, w, x, y):
         """
         Função unica e exclusivamente para remover o objeto da imagem binária
@@ -460,23 +475,22 @@ class image:
         cv.floodFill(self.binaryImage, mask, (x, y), 255)
 
     def grayscale(self, image):
-        image = cv.imread(
-            "C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Entradas\\Teste01.png")
-        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-
-        # Change the current directory to specified directory
-        os.chdir("C:\\Users\\Sharkb8i_\\Desktop\\FACUL\\PID\\Trabalho #1\\Image-Processing\\feature-extraction\\images\\Grayscale")
-        cv.imwrite("Teste01Gray.png", gray)
-
-        #cv.imshow('Original Image', image)
-        #cv.imshow('Gray Image', gray)
-        # cv.waitKey(0)
-        # cv.destroyAllWindows()
+        """ 
+            A saída do computador deve ser gravada em um canal de imagem (raster) 
+            equipado para lidar com números reais, geralmente reais de 32 bits (32R).
+            Se colocado em um canal inteiro de 8 ou 16 bits, o valor será registrado
+            como 0.
+        """
+        img_float32 = np.float32(image)
+        gray = cv.cvtColor(img_float32, cv.COLOR_BGR2GRAY)
+        return gray
 
     def glmc(self, image, distances, angles, levels=None, symmetric=False):
         image = np.ascontiguousarray(image)
 
         image_max = image.max()         # Maior tom de cor que existe na imagem
+        print("Image max: ", image_max)
+        input
 
         """
             O argumento de níveis (levels) é necessário para tipos de dados diferentes
