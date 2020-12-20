@@ -31,5 +31,36 @@ def main():
     #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
     #print(t)
 
+    """
+    im = np.array([[0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [0, 2, 2, 2],
+                    [2, 2, 3, 3]], dtype=np.uint8)
+
+        # O resultado é esse, tem esse quantidade de zero, porque
+        # o level utilizado para tons de cinza foi 8, logo (8x8).
+        # [
+        #   [[[2]],[[2]],[[1]],[[0]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[2]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[0]],[[3]],[[1]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[0]],[[0]],[[1]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
+        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
+        # ]
+
+        result = images[0].glmc(im, 1, 0, levels=8)
+
+        contraste = images[0].glcmprops(result, 'contrast')
+        uniformidade = images[0].glcmprops(result, 'homogeneity')
+        correlacao = images[0].glcmprops(result, 'correlation')
+        
+        print("Contraste: ", contraste)
+        print("Uniformidade: ", uniformidade)
+        print("Correlação: ", correlacao)
+
+        #images[0].generate_csv_and_save(result)
+    """
 
 main()

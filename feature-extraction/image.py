@@ -458,3 +458,75 @@ class image:
         mask = np.zeros((h+2, w+2), np.uint8)
 
         cv.floodFill(self.binaryImage, mask, (x, y), 255)
+
+    
+
+    def glcmprops(self, P, prop='contrast'):
+        
+        (num_level, num_level2, num_dist, num_angle) = P.shape
+
+        # Normalize each GLCM
+        P = P.astype(np.float64)
+        glcm_sums = np.apply_over_axes(np.sum, P, axes=(0, 1))
+        glcm_sums[glcm_sums == 0] = 1
+        P /= glcm_sums
+
+        # Create weights for specified property
+        I, J = np.ogrid[0:num_level, 0:num_level]
+        if prop == 'contrast':
+            weights = (I - J) ** 2
+            weights = weights.reshape((num_level, num_level, 1, 1))
+            results = np.apply_over_axes(np.sum, (P * weights), axes=(0, 1))[0, 0]
+        elif prop == 'homogeneity':
+            weights = 1. / (1. + (I - J) ** 2)
+            weights = weights.reshape((num_level, num_level, 1, 1))
+            results = np.apply_over_axes(np.sum, (P * weights), axes=(0, 1))[0, 0]
+        elif prop == 'correlation':
+            results = np.zeros((num_dist, num_angle), dtype=np.float64)
+            I = np.array(range(num_level)).reshape((num_level, 1, 1, 1))
+            J = np.array(range(num_level)).reshape((1, num_level, 1, 1))
+            diff_i = I - np.apply_over_axes(np.sum, (I * P), axes=(0, 1))[0, 0]
+            diff_j = J - np.apply_over_axes(np.sum, (J * P), axes=(0, 1))[0, 0]
+
+            std_i = np.sqrt(np.apply_over_axes(np.sum, (P * (diff_i) ** 2),
+                                            axes=(0, 1))[0, 0])
+            std_j = np.sqrt(np.apply_over_axes(np.sum, (P * (diff_j) ** 2),
+                                            axes=(0, 1))[0, 0])
+            cov = np.apply_over_axes(np.sum, (P * (diff_i * diff_j)),
+                                    axes=(0, 1))[0, 0]
+
+            # handle the special case of standard deviations near zero
+            mask_0 = std_i < 1e-15
+            mask_0[std_j < 1e-15] = True
+            results[mask_0] = 1
+
+            # handle the standard case
+            mask_1 = mask_0 == False
+            results[mask_1] = cov[mask_1] / (std_i[mask_1] * std_j[mask_1])
+        else:
+            print("Propriedade inválida!")
+            return P
+
+        return results
+        
+def generate_csv_and_save(self, image):
+        """
+        No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
+        gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
+            - ID  Imagem(mesmo  nome  do  arquivo  de  entrada);
+            - ID  Folha(Inteiro sequencial, reiniciado para cada nova imagem de entrada);
+            - Propriedade 1, Propriedade 2, ..., Propriedade N.
+        
+        O perímetro também é propriedade a ser armazenada  no  arquivo  .csv,  bem
+        como as propriedades especificadas para cada uma das equipes, de acordo com
+        a lista abaixo.
+
+        Os campos devem, necessariamente serem separados por vírgula.
+        Valores fracionários devem usar o “.” como separador decimal.
+        """
+        img_array = (image.flatten())
+        img_array = img_array.reshape(-1, 1).T
+        #print(img_array)
+
+        with open('output.csv', 'ab') as f:
+            np.savetxt(f, img_array, delimiter=",")
