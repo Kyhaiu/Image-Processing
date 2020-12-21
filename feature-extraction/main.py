@@ -40,7 +40,7 @@ def main():
     for i in image_files:
         images = img.image(path, i)
         print("Arquivo: ", i)
-        df = generate_csv_and_save(images.segmentation(images.getBinaryImage(), 0, 0), df, path)
+        generate_csv_and_save(images.segmentation(images.getBinaryImage(), 0, 0), df, path)
 
 def generate_csv_and_save(images, df, path):
     """
@@ -80,10 +80,9 @@ def generate_csv_and_save(images, df, path):
         df = df.append(dicty, ignore_index=True)
         j += 1
 
-
-
-    df.to_csv(path + '\\' + 'Resultados.csv', index=False, mode='a')
+    df.to_csv(path + '\\' + 'Resultados.csv', index=False, mode='a', header = False)
     print("CSV salvo!")
-    return df
+
+    #return df
 
 main()
