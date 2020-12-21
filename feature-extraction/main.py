@@ -1,6 +1,8 @@
 import os
-import image as img
 import cv2 as cv
+import numpy as np
+import image as img
+import pandas as pd
 from matplotlib import pyplot as plt
 
 
@@ -24,44 +26,35 @@ def main():
     print("Arquivos identificados: ", image_files)
 
     images = None
+    image_ready = []
     for i in image_files:
         images = img.image(path, i)
         print("Arquivo: ", image_files)
-        image = images.segmentation(images.getBinaryImage(), 0, 0)
+        image_ready.append(images.segmentation(images.getBinaryImage(), 0, 0))
 
-    #t = images[0].segmentation(images[0].getBinaryImage(), 0, 0)
-    #print(t)
+    return image_ready
 
+def generate_csv_and_save(images):
     """
-    im = np.array([[0, 0, 1, 1],
-                   [0, 0, 1, 1],
-                   [0, 2, 2, 2],
-                   [2, 2, 3, 3]], dtype=np.uint8)
+    No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
+    gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
+        - ID  Imagem(mesmo  nome  do  arquivo  de  entrada);
+        - ID  Folha(Inteiro sequencial, reiniciado para cada nova imagem de entrada);
+        - Propriedade 1, Propriedade 2, ..., Propriedade N.
+    
+    O perímetro também é propriedade a ser armazenada  no  arquivo  .csv,  bem
+    como as propriedades especificadas para cada uma das equipes, de acordo com
+    a lista abaixo.
 
-        # O resultado é esse, tem esse quantidade de zero, porque
-        # o level utilizado para tons de cinza foi 8, logo (8x8).
-        # [
-        #   [[[2]],[[2]],[[1]],[[0]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[2]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[0]],[[3]],[[1]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[0]],[[0]],[[1]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
-        #   [[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]],[[0]]]
-        # ]
-
-        result = images[0].glmc(im, 1, 0, levels=8)
-
-        contraste = images[0].glcmprops(result, 'contrast')
-        uniformidade = images[0].glcmprops(result, 'homogeneity')
-        correlacao = images[0].glcmprops(result, 'correlation')
-        
-        print("Contraste: ", contraste)
-        print("Uniformidade: ", uniformidade)
-        print("Correlação: ", correlacao)
-
-        #images[0].generate_csv_and_save(result)
+    Os campos devem, necessariamente serem separados por vírgula.
+    Valores fracionários devem usar o “.” como separador decimal.
     """
 
-main()
+    for i in images:
+        dict = {"ID Imagem": i[0], "ID Folha": i[1], "Perimetro": i[2], "Contraste": i[3], "Homogeneidade": i[4], "Correlacao": i[5]}
+    df = pd.DataFrame(dict)
+    df.to_csv('Resultados.csv')
+    print("CSV salvo!")
+
+images = main()
+generate_csv_and_save(images)

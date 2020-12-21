@@ -281,11 +281,17 @@ class image:
         Retorno:\n
             \tnão possui retorno(PODE MUDAR)
         """
-        #plt.imshow(self.image)
-        #plt.show()
+        
         cont = 1
         b0 = self.find_next_non_white_pixel(image, 0, 0)
         c0 = [b0[0]-1, b0[1]]
+        perimeter = []
+        leaf_name = []
+
+        contrast = []
+        homogeneity = []
+        correlation = []
+
         while b0[0] != -1 :
 
             b, c = self.eight_neighborhood(image, b0, c0)
@@ -327,26 +333,24 @@ class image:
                 
             self.saveBorder(width, height, frontier, max(x), max(y), cont)
 
+
             cropped_image = self.cropAndSave(self.getImage(), min(x), min(y), max(x), max(y), cont, frontier)
+            perimeter.append(len(frontier))
 
             gray_image = self.grayscale(cropped_image)
             gray_image = np.array(gray_image, dtype=np.uint8)
             glmc = self.glmc(gray_image, 1, 0, levels=255)
-            contrast = self.glcmprops(glmc, 'contrast')
-            homogeneity = self.glcmprops(glmc, 'homogeneity')
-            correlation = self.glcmprops(glmc, 'correlation')
+            contrast.append(self.glcmprops(glmc, 'contrast')[0][0])
+            homogeneity.append(self.glcmprops(glmc, 'homogeneity')[0][0])
+            correlation.append(self.glcmprops(glmc, 'correlation')[0][0])
 
-            print("Grayscale: ", gray_image)
-            print("GLMC: ", glmc)
-            print("Contrast: ", contrast)
-            print("Homogeneity: ", homogeneity)
-            print("Correlation: ", correlation)
-            input()
+            leaf_name.append(self.getFilename().replace(".png","") + str(cont) + ".png")
 
             cont+=1
             b0 = self.find_next_non_white_pixel(image, 0, 0)
             c0 = [b0[0]-1, b0[1]]
-            
+        
+        return [self.getFilename(), leaf_name, perimeter, contrast, homogeneity, correlation]
         
     def removeNoise(self, frontier):
         """
@@ -377,6 +381,7 @@ class image:
         -------
             return: Nada por enquanto
         """
+
         print("Salvando cópia da borda da folha segmentada.")
         print("Borda : " + self.getFilename().replace(".png","") + str(cont) + "-P.png")
         newImage = np.zeros((height, width))
@@ -489,8 +494,6 @@ class image:
         image = np.ascontiguousarray(image)
 
         image_max = image.max()         # Maior tom de cor que existe na imagem
-        print("Image max: ", image_max)
-        input
 
         """
             O argumento de níveis (levels) é necessário para tipos de dados diferentes
@@ -588,25 +591,3 @@ class image:
             return P
 
         return results
-        
-def generate_csv_and_save(self, image):
-        """
-        No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
-        gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
-            - ID  Imagem(mesmo  nome  do  arquivo  de  entrada);
-            - ID  Folha(Inteiro sequencial, reiniciado para cada nova imagem de entrada);
-            - Propriedade 1, Propriedade 2, ..., Propriedade N.
-        
-        O perímetro também é propriedade a ser armazenada  no  arquivo  .csv,  bem
-        como as propriedades especificadas para cada uma das equipes, de acordo com
-        a lista abaixo.
-
-        Os campos devem, necessariamente serem separados por vírgula.
-        Valores fracionários devem usar o “.” como separador decimal.
-        """
-        img_array = (image.flatten())
-        img_array = img_array.reshape(-1, 1).T
-        #print(img_array)
-
-        with open('output.csv', 'ab') as f:
-            np.savetxt(f, img_array, delimiter=",")
