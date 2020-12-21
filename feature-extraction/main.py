@@ -16,7 +16,7 @@ def main():
     path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
 
     image_files = []
-    k = 1
+    k = 6
     for name in os.listdir(path):
         if os.path.isfile(path + '\\' + name):
             if name ==  "Teste" + str(k).zfill(2) + ".png":
@@ -50,10 +50,21 @@ def generate_csv_and_save(images):
     Valores fracionários devem usar o “.” como separador decimal.
     """
 
+    import csv
+    print("Gerando CSV...")
+    count = True
     for i in images:
+        field_names = ["ID Imagem", "ID Folha", "Perimetro", "Contraste", "Homogeneidade", "Correlacao"]
         dict = {"ID Imagem": i[0], "ID Folha": i[1], "Perimetro": i[2], "Contraste": i[3], "Homogeneidade": i[4], "Correlacao": i[5]}
-    df = pd.DataFrame(dict)
-    df.to_csv('Resultados.csv')
+
+        with open('Resultados.csv', 'a') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=field_names)
+            if(count):
+                writer.writeheader()
+                count = False
+            writer.writerows(dict)
+
+
     print("CSV salvo!")
 
 images = main()
