@@ -14,12 +14,23 @@ def main():
     print('Por favor informe o caminho das imagens a serem extraidas as caracteristicas: ')
     path = input()
     #path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
+    try:
+        f = open(path+'\\'+'Resultados.csv', mode='w+')
+        # Do something with the file
+        f.close()
+    except FileNotFoundError:
+        print("Nenhum CSV encontrado")
 
     image_files = []
     k = 0
     for name in os.listdir(path):
         if os.path.isfile(path + '\\' + name):
-            image_files.append(name)
+            if name.find('-') != -1:
+                os.remove(path + '\\' + name)
+            elif name.find('Resultados.csv') == 0:
+                continue
+            else:
+                image_files.append(name)
 
     print("Arquivos identificados: ", image_files)
 
@@ -28,10 +39,10 @@ def main():
     df = pd.DataFrame(columns = ['ID Imagem', 'ID Folha', "Perimetro", "Contraste", "Homogeneidade", "Correlacao"])
     for i in image_files:
         images = img.image(path, i)
-        print("Arquivo: ", image_files)
-        generate_csv_and_save(images.segmentation(images.getBinaryImage(), 0, 0), df)
+        print("Arquivo: ", i)
+        df = generate_csv_and_save(images.segmentation(images.getBinaryImage(), 0, 0), df, path)
 
-def generate_csv_and_save(images, df):
+def generate_csv_and_save(images, df, path):
     """
     No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
     gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
@@ -48,7 +59,7 @@ def generate_csv_and_save(images, df):
     """
 
     import csv
-    print("Gerando CSV...")
+    print("Adicionando elementos no CSV...")
     count = True
     id_img = images[0]
     id_folha = images[1]
@@ -71,7 +82,8 @@ def generate_csv_and_save(images, df):
 
 
 
-    df.to_csv("Resultados.csv", index=False, mode='a')
+    df.to_csv(path + '\\' + 'Resultados.csv', index=False, mode='a')
     print("CSV salvo!")
+    return df
 
 main()
