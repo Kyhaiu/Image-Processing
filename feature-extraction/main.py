@@ -12,29 +12,26 @@ def main():
         Executa todo o programa, se quiser deixar constante a execução vc pode passar via prametro na main
     """
     print('Por favor informe o caminho das imagens a serem extraidas as caracteristicas: ')
-    #path = input()
-    path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
+    path = input()
+    #path = "C:\\Users\\Sharkb8i\\Documents\\GitHub\\Image-Processing\\feature-extraction\\images\\Entradas"
 
     image_files = []
-    k = 6
+    k = 0
     for name in os.listdir(path):
         if os.path.isfile(path + '\\' + name):
-            if name ==  "Teste" + str(k).zfill(2) + ".png":
-                image_files.append(name)
-                k += 1
+            image_files.append(name)
 
     print("Arquivos identificados: ", image_files)
 
     images = None
     image_ready = []
+    df = pd.DataFrame(columns = ['ID Imagem', 'ID Folha', "Perimetro", "Contraste", "Homogeneidade", "Correlacao"])
     for i in image_files:
         images = img.image(path, i)
         print("Arquivo: ", image_files)
-        image_ready.append(images.segmentation(images.getBinaryImage(), 0, 0))
+        generate_csv_and_save(images.segmentation(images.getBinaryImage(), 0, 0), df)
 
-    return image_ready
-
-def generate_csv_and_save(images):
+def generate_csv_and_save(images, df):
     """
     No arquivo .csv, cada imagem, folha e propriedades dela extraídas serão
     gravadas em uma linhado arquivo. Sugerimos o seguinte formato:
@@ -53,19 +50,28 @@ def generate_csv_and_save(images):
     import csv
     print("Gerando CSV...")
     count = True
-    for i in images:
-        field_names = ["ID Imagem", "ID Folha", "Perimetro", "Contraste", "Homogeneidade", "Correlacao"]
-        dict = {"ID Imagem": i[0], "ID Folha": i[1], "Perimetro": i[2], "Contraste": i[3], "Homogeneidade": i[4], "Correlacao": i[5]}
+    id_img = images[0]
+    id_folha = images[1]
+    per = images[2]
+    cont = images[3]
+    homo = images[4]
+    corel = images[5]
+    j = 0
+    while j < len(images[1]):
+        dicty = {
+                 'ID Imagem'     : id_img,
+                 'ID Folha'      : id_folha[j],
+                 'Perimetro'     : per[j],
+                 'Contraste'     : cont[j],
+                 'Homogeneidade' : homo[j],
+                 'Correlacao'    : corel[j]
+                }
+        df = df.append(dicty, ignore_index=True)
+        j += 1
 
-        with open('Resultados.csv', 'a') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=field_names)
-            if(count):
-                writer.writeheader()
-                count = False
-            writer.writerows(dict)
 
 
+    df.to_csv("Resultados.csv", index=False, mode='a')
     print("CSV salvo!")
 
-images = main()
-generate_csv_and_save(images)
+main()

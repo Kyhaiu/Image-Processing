@@ -344,7 +344,7 @@ class image:
             homogeneity.append(self.glcmprops(glmc, 'homogeneity')[0][0])
             correlation.append(self.glcmprops(glmc, 'correlation')[0][0])
 
-            leaf_name.append(self.getFilename().replace(".png","") + str(cont) + ".png")
+            leaf_name.append(self.getFilename().replace(".png","-") + str(cont) + ".png")
 
             cont+=1
             b0 = self.find_next_non_white_pixel(image, 0, 0)
@@ -383,7 +383,7 @@ class image:
         """
 
         print("Salvando cópia da borda da folha segmentada.")
-        print("Borda : " + self.getFilename().replace(".png","") + str(cont) + "-P.png")
+        print("Borda : " + self.getFilename().replace(".png","-") + str(cont) + "-P.png")
         newImage = np.zeros((height, width))
         
         #print(newImage.shape)
@@ -407,7 +407,7 @@ class image:
     
 
         image = cv.rotate(fliped, cv.ROTATE_90_CLOCKWISE) 
-        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","") + str(cont) +"-P.png"  , image)
+        cv.imwrite(self.getPath() + "\\" + self.getFilename().replace(".png","-") + str(cont) +"-P.png"  , image)
 
         del fliped, image
         
@@ -428,7 +428,7 @@ class image:
             \treturn: Nada por enquanto
         """
         print("Salvando cópia da folha segmentada.")
-        print("Folha : " + self.getFilename().replace(".png","") + str(cont) + ".png")
+        print("Folha : " + self.getFilename().replace(".png","-") + str(cont) + ".png")
         mask = cv.imread(self.getPath()+"\\"+self.getFilename().replace(".png","") + str(cont) + "-P.png")
         frontier_matrix = np.array(frontier)
 
